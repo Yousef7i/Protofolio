@@ -1112,3 +1112,17 @@ body::after {
 
 .admin-dashboard { min-height: 100vh; background: var(--c-bg); display: flex; justify-content: center; padding: 2rem 1rem; }
 .ad-container { width: 100%; max-width: 800px; }
+
+
+/* ─── MOBILE RESPONSIVENESS ─── */
+@media (max-width: 768px) {
+  .hero { flex-direction: column; padding-top: 6rem; text-align: center; gap: 3rem; }
+  .hero-right { justify-content: center; }
+  .hero-skills { justify-content: center; }
+  .hero-actions { justify-content: center; }
+  .f-app { flex-direction: column !important; }
+  .f-app-mockup { max-width: 100%; margin-bottom: 2rem; }
+  .f-app-content { text-align: center; }
+  .f-app-content p { margin: 0 auto 1.5rem auto; }
+  .admin-dashboard { padding: 1rem 0.5rem; }
+}

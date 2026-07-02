@@ -4,12 +4,13 @@ import Hero        from './components/Hero';
 import Gallery     from './components/Gallery';
 import AdminPanel  from './components/AdminPanel';
 import FeaturedApp from './components/FeaturedApp';
-import { loadProfile, saveProfile, loadProjects, saveProjects, defaultProfile, loadDemos, saveDemos } from './store/store';
+import { saveProfile, saveProjects, saveDemos, defaultProfile, subscribeToProfile, subscribeToProjects, subscribeToDemos } from './store/store';
 
 export default function App() {
-  const [profile,  setProfile]  = useState(() => ({ ...defaultProfile, ...loadProfile() }));
-  const [projects, setProjects] = useState(() => loadProjects() || []);
-  const [demos,    setDemos]    = useState(() => loadDemos() || []);
+  const [profile,  setProfile]  = useState(defaultProfile);
+  const [projects, setProjects] = useState([]);
+  const [demos,    setDemos]    = useState([]);
+  const [loading,  setLoading]  = useState(true);
   const [adminOpen, setAdminOpen] = useState(false);
   const workRef = useRef(null);
 
@@ -23,6 +24,43 @@ export default function App() {
     };
     window.addEventListener('mousemove', move, { passive: true });
     return () => window.removeEventListener('mousemove', move);
+  }, []);
+
+  /* Firebase Data Subscriptions */
+  useEffect(() => {
+    let loadedProfile = false;
+    let loadedProjects = false;
+    let loadedDemos = false;
+
+    const checkLoading = () => {
+      if (loadedProfile && loadedProjects && loadedDemos) {
+        setLoading(false);
+      }
+    };
+
+    const unsubProfile = subscribeToProfile((data) => {
+      setProfile({ ...defaultProfile, ...data });
+      loadedProfile = true;
+      checkLoading();
+    });
+
+    const unsubProjects = subscribeToProjects((data) => {
+      setProjects(data);
+      loadedProjects = true;
+      checkLoading();
+    });
+
+    const unsubDemos = subscribeToDemos((data) => {
+      setDemos(data);
+      loadedDemos = true;
+      checkLoading();
+    });
+
+    return () => {
+      unsubProfile();
+      unsubProjects();
+      unsubDemos();
+    };
   }, []);
 
   /* Persist profile changes */
@@ -58,6 +96,14 @@ export default function App() {
   };
 
   const scrollToWork = () => workRef.current?.scrollIntoView({ behavior: 'smooth' });
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: 'var(--gold-300)', fontFamily: 'DM Mono', letterSpacing: '2px' }}>LOADING DATA...</div>
+      </div>
+    );
+  }
 
   return (
     <>

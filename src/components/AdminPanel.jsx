@@ -1,6 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { uploadToCloudinary } from '../lib/cloudinary';
 import { CATEGORIES } from '../store/store';
+import { auth } from '../lib/firebase';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 
 /* ══════════════════════════════════════════
    Single upload row with progress
@@ -83,9 +85,35 @@ export default function AdminPanel({
   projects, onAddProject, onDeleteProject,
   demos, onDemosChange,
 }) {
+  const [user, setUser] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+
   const [tab, setTab] = useState('profile');   // 'profile' | 'projects' | 'demos'
   const [photoProgress, setPhotoProgress] = useState(null);
   const [photoError,    setPhotoError]    = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      setAuthError('Invalid email or password.');
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
 
   /* Upload profile photo */
   const handlePhotoUpload = async (file) => {
@@ -109,11 +137,28 @@ export default function AdminPanel({
       <aside className={`admin-panel${isOpen ? ' open' : ''}`}>
         <div className="ap-header">
           <h2 className="ap-title">Dashboard</h2>
-          <button className="ap-close" onClick={onClose}>✕</button>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            {user && <button className="ap-close" onClick={handleLogout} style={{ fontSize: '14px', background: 'var(--c-elevated)', padding: '4px 10px', borderRadius: '4px' }}>Logout</button>}
+            <button className="ap-close" onClick={onClose}>✕</button>
+          </div>
         </div>
 
-        {/* Tabs */}
-        <div className="ap-tabs">
+        {!user ? (
+          <div className="ap-body" style={{ justifyContent: 'center' }}>
+            <div className="ap-section">
+              <p className="ap-section-label" style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--gold-300)' }}>Secure Admin Login</p>
+              <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <input type="email" placeholder="Email" className="ap-input" value={email} onChange={e => setEmail(e.target.value)} required />
+                <input type="password" placeholder="Password" className="ap-input" value={password} onChange={e => setPassword(e.target.value)} required />
+                <button type="submit" className="ap-file-btn" style={{ justifyContent: 'center', marginTop: '0.5rem' }}>Login to Dashboard</button>
+                {authError && <p className="ap-error" style={{ textAlign: 'center' }}>{authError}</p>}
+              </form>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Tabs */}
+            <div className="ap-tabs">
           <button className={`ap-tab${tab === 'profile'  ? ' active' : ''}`} onClick={() => setTab('profile')}>Profile</button>
           <button className={`ap-tab${tab === 'projects' ? ' active' : ''}`} onClick={() => setTab('projects')}>Portfolio ({projects.length})</button>
           <button className={`ap-tab${tab === 'demos'    ? ' active' : ''}`} onClick={() => setTab('demos')}>Modules</button>
@@ -320,6 +365,8 @@ export default function AdminPanel({
               );
             })}
           </div>
+        )}
+          </>
         )}
       </aside>
     </>

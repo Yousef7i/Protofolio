@@ -1,32 +1,15 @@
-/**
- * useStore — central state for all portfolio content
- * Persists everything in localStorage
- */
+import { db } from '../lib/firebase';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 
-const KEYS = {
-  profile: 'pf_profile',
-  projects: 'pf_projects',
-  demos: 'pf_demos',
-};
-
-function load(key, fallback) {
-  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
-}
-function save(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
-}
-
-// Default profile object
 export const defaultProfile = {
   name:       'Mohamed Ghanem',
   title:      'Flutter Developer',
   bio:        'Building smooth, beautiful cross-platform applications with Flutter & Dart. Passionate about clean architecture and pixel-perfect UI.',
   location:   'Egypt',
-  photo:      null,   // Cloudinary secure_url
-  photoId:    null,   // Cloudinary public_id
+  photo:      null,
+  photoId:    null,
 };
 
-// Default categories (sections of the portfolio)
 export const CATEGORIES = [
   { id: 'flutter',  label: 'Flutter Apps' },
   { id: 'ui',       label: 'UI / UX' },
@@ -34,11 +17,51 @@ export const CATEGORIES = [
   { id: 'other',    label: 'Other' },
 ];
 
-export function loadProfile()  { return load(KEYS.profile,  defaultProfile); }
-export function saveProfile(p) { save(KEYS.profile, p); }
+// Document References
+const profileRef = doc(db, 'portfolio', 'profile');
+const projectsRef = doc(db, 'portfolio', 'projects_list');
+const demosRef = doc(db, 'portfolio', 'demos_list');
 
-export function loadProjects()  { return load(KEYS.projects, []); }
-export function saveProjects(p) { save(KEYS.projects, p); }
+// Listeners (for real-time updates across the app)
+export function subscribeToProfile(callback) {
+  return onSnapshot(profileRef, (docSnap) => {
+    if (docSnap.exists()) {
+      callback(docSnap.data());
+    } else {
+      callback(defaultProfile);
+    }
+  });
+}
 
-export function loadDemos()  { return load(KEYS.demos, []); }
-export function saveDemos(d) { save(KEYS.demos, d); }
+export function subscribeToProjects(callback) {
+  return onSnapshot(projectsRef, (docSnap) => {
+    if (docSnap.exists()) {
+      callback(docSnap.data().items || []);
+    } else {
+      callback([]);
+    }
+  });
+}
+
+export function subscribeToDemos(callback) {
+  return onSnapshot(demosRef, (docSnap) => {
+    if (docSnap.exists()) {
+      callback(docSnap.data().items || []);
+    } else {
+      callback([]);
+    }
+  });
+}
+
+// Mutators
+export async function saveProfile(profileData) {
+  await setDoc(profileRef, profileData);
+}
+
+export async function saveProjects(projectsList) {
+  await setDoc(projectsRef, { items: projectsList });
+}
+
+export async function saveDemos(demosList) {
+  await setDoc(demosRef, { items: demosList });
+}

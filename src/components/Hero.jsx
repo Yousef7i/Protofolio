@@ -1,6 +1,6 @@
 import { getOptimizedUrl } from '../lib/cloudinary';
 
-export default function Hero({ profile, onScrollToWork, onAdminOpen }) {
+export default function Hero({ profile, onScrollToWork }) {
   const { name, title, bio, location, photo } = profile;
 
   return (
@@ -31,16 +31,13 @@ export default function Hero({ profile, onScrollToWork, onAdminOpen }) {
           <button className="btn-primary" onClick={onScrollToWork}>
             View Work <span className="arrow">→</span>
           </button>
-          <button className="btn-ghost" onClick={onAdminOpen}>
-            ⚙ Manage Portfolio
-          </button>
         </div>
       </div>
 
       {/* ─── RIGHT: Photo + Skills ─── */}
       <div className="hero-right">
         {/* Profile Photo */}
-        <div className="hero-photo-wrap" onClick={onAdminOpen} title="Click to change photo">
+        <div className="hero-photo-wrap">
           {photo ? (
             <img
               src={getOptimizedUrl(photo, { width: 400, height: 400, quality: 'auto' })}
@@ -49,8 +46,7 @@ export default function Hero({ profile, onScrollToWork, onAdminOpen }) {
             />
           ) : (
             <div className="hero-photo-placeholder">
-              <span className="hero-photo-icon">+</span>
-              <span className="hero-photo-label">Add Photo</span>
+              <span className="hero-photo-icon"></span>
             </div>
           )}
           <div className="hero-photo-ring" />

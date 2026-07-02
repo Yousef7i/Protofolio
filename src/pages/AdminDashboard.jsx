@@ -77,10 +77,9 @@ function UploadRow({ onDone }) {
 }
 
 /* ══════════════════════════════════════════
-   Admin Panel (slide-in drawer)
+   Admin Dashboard Page
 ══════════════════════════════════════════ */
-export default function AdminPanel({
-  isOpen, onClose,
+export default function AdminDashboard({
   profile, onProfileChange,
   projects, onAddProject, onDeleteProject,
   demos, onDemosChange,
@@ -129,17 +128,13 @@ export default function AdminPanel({
   };
 
   return (
-    <>
-      {/* Backdrop */}
-      {isOpen && <div className="ap-backdrop" onClick={onClose} />}
-
-      {/* Drawer */}
-      <aside className={`admin-panel${isOpen ? ' open' : ''}`}>
+    <div className="admin-dashboard">
+      <div className="ad-container">
         <div className="ap-header">
           <h2 className="ap-title">Dashboard</h2>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <a href="/" className="btn-ghost" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>← Back to Site</a>
             {user && <button className="ap-close" onClick={handleLogout} style={{ fontSize: '14px', background: 'var(--c-elevated)', padding: '4px 10px', borderRadius: '4px' }}>Logout</button>}
-            <button className="ap-close" onClick={onClose}>✕</button>
           </div>
         </div>
 
@@ -368,7 +363,7 @@ export default function AdminPanel({
         )}
           </>
         )}
-      </aside>
-    </>
+      </div>
+    </div>
   );
 }

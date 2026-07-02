@@ -8,7 +8,6 @@ export default function App() {
   const [profile,  setProfile]  = useState(defaultProfile);
   const [projects, setProjects] = useState([]);
   const [demos,    setDemos]    = useState([]);
-  const [loading,  setLoading]  = useState(true);
 
   /* Cursor ambient glow */
   useEffect(() => {
@@ -24,32 +23,16 @@ export default function App() {
 
   /* Firebase Data Subscriptions */
   useEffect(() => {
-    let loadedProfile = false;
-    let loadedProjects = false;
-    let loadedDemos = false;
-
-    const checkLoading = () => {
-      if (loadedProfile && loadedProjects && loadedDemos) {
-        setLoading(false);
-      }
-    };
-
     const unsubProfile = subscribeToProfile((data) => {
       setProfile({ ...defaultProfile, ...data });
-      loadedProfile = true;
-      checkLoading();
     });
 
     const unsubProjects = subscribeToProjects((data) => {
       setProjects(data);
-      loadedProjects = true;
-      checkLoading();
     });
 
     const unsubDemos = subscribeToDemos((data) => {
       setDemos(data);
-      loadedDemos = true;
-      checkLoading();
     });
 
     return () => {
@@ -82,13 +65,8 @@ export default function App() {
     saveDemos(updatedDemos);
   };
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: 'var(--gold-300)', fontFamily: 'DM Mono', letterSpacing: '2px' }}>LOADING DATA...</div>
-      </div>
-    );
-  }
+  // The UI will now render instantly using default profile data
+  // while Firebase loads the projects and updates in the background.
 
   return (
     <BrowserRouter>

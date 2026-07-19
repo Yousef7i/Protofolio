@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vantage Academy — App Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    /* ═══════════════════════════════════
+       DESIGN TOKENS — from colors.dart
+    ═══════════════════════════════════ */
+    :root {
+      /* Primary */
+      --primary:       #006D77;
+      --primary-dark:  #004E57;
+      --primary-light: #83C5BE;
+      --gold:          #FFB703;
+      --gold-dark:     #FB8500;
+
+      /* Dark theme (default — app uses dark) */
+      --bg:            #1B263B;
+      --surface:       #243447;
+      --surface-solid: #243447;
+      --elevated:      #2F3E5A;
+      --border:        #2F3E5A;
+
+      /* Text */
+      --txt-1:  #F1F3F5;
+      --txt-2:  #CED4DA;
+      --txt-m:  #6C757D;
+
+      /* Status */
+      --error:   #E63946;
+      --success: #2DC653;
+      --warning: #F59E0B;
+      --info:    #3B82F6;
+    }
+
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    button { background: none; border: none; cursor: pointer; font-family: inherit; }
+
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: #080e1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 60px;
+      color: var(--txt-1);
+    }
+
+    /* ─── PAGE HEADER ─── */
+    .page-title {
+      font-family: 'Cairo', sans-serif;
+      font-size: 28px; font-weight: 900;
+      color: var(--gold);
+      letter-spacing: -.5px;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .page-sub {
+      color: var(--txt-2); font-size: 14px;
+      margin-bottom: 32px; text-align: center;
+    }
+
+    /* ─── SCREEN SWITCHER TABS ─── */
+    .tabs {
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 8px;
+      max-width: 880px;
+      margin-bottom: 36px;
+    }
+    .tab {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      color: var(--txt-2);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .tab:hover  { border-color: var(--primary-light); color: var(--primary-light); }
+    .tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+    /* ─── iPhone FRAME ─── */
+    .phone {
+      width: 390px; height: 820px;
+      background: var(--bg);
+      border-radius: 54px;
+      border: 12px solid #000;
+      box-shadow: 0 0 0 2px #2a2a2a, 0 40px 90px rgba(0,0,0,.7);
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    /* Dynamic Island */
+    .di {
+      position: absolute; top: 12px; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 34px;
+      background: #000; border-radius: 20px;
+      z-index: 300;
+      display: flex; align-items: center;
+      justify-content: space-between; padding: 0 14px;
+    }
+    .di-cam { width: 10px; height: 10px; background: #090909; border-radius: 50%; border: 1.5px solid #181818; }
+    .di-dot { width: 7px; height: 7px; background: #000; border-radius: 50%; }
+
+    /* Status bar */
+    .statusbar {
+      height: 46px; flex-shrink: 0;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: relative; z-index: 200;
+    }
+    .sb-time { font-family: -apple-system, sans-serif; font-size: 15px; font-weight: 700; color: #fff; }
+    .sb-icons { display: flex; align-items: center; gap: 5px; }
+    .sb-icons i { width: 16px; height: 16px; color: #fff; }
+    .batt { width: 22px; height: 12px; border: 1.5px solid #fff; border-radius: 3px; display: flex; align-items: center; position: relative; }
+    .batt::after { content:''; position:absolute; right:-5px; top:50%; transform:translateY(-50%); width:3px; height:7px; background:#fff; border-radius:0 2px 2px 0; }
+    .batt-fill { width:75%; height:7px; background:#4caf50; border-radius:2px; margin: 0 1px; }
+
+    /* ─── SCREEN CONTAINER ─── */
+    .screens {
+      flex: 1; position: relative; overflow: hidden;
+    }
+    .screen {
+      position: absolute; inset: 0;
+      display: none; flex-direction: column;
+      overflow: hidden;
+    }
+    .screen.active {
+      display: flex;
+      animation: fadeSlide .3s ease;
+    }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .scroller {
+      flex: 1; overflow-y: auto;
+      scrollbar-width: none;
+      padding-bottom: 90px;
+    }
+    .scroller::-webkit-scrollbar { display: none; }
+
+    /* ═══════════════════════════════════
+       SHARED COMPONENTS
+    ═══════════════════════════════════ */
+
+    /* Curved header bg — from CurvedHeaderBackground */
+    .curve-header {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 340px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border-bottom-left-radius: 40px;
+      border-bottom-right-radius: 40px;
+      z-index: 0; overflow: hidden;
+    }
+    .curve-header::before {
+      content:''; position:absolute;
+      top:-80px; left:-60px;
+      width:260px; height:260px;
+      background:rgba(255,255,255,.05); border-radius:50%;
+    }
+    .curve-header::after {
+      content:''; position:absolute;
+      bottom:-50px; right:-40px;
+      width:200px; height:200px;
+      background:rgba(255,255,255,.04); border-radius:50%;
+    }
+
+    /* Auth background blur */
+    .auth-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse at 30% 20%, rgba(0,109,119,.12) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 80%, rgba(255,183,3,.06) 0%, transparent 50%),
+                  var(--bg);
+    }
+    .auth-bg::before {
+      content:''; position:absolute;
+      top:-40%; right:-30%;
+      width:500px; height:500px;
+      background:rgba(0,109,119,.04);
+      border-radius:50%;
+    }
+
+    /* ── CustomTopBar ── */
+    .top-bar {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      position: relative; z-index: 10;
+    }
+    .top-bar-actions { display: flex; gap: 8px; }
+    .glass-btn {
+      width: 48px; height: 48px; border-radius: 16px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; cursor: pointer;
+    }
+    .glass-btn i { color: #fff; width: 24px; height: 24px; }
+    .notif-dot {
+      position: absolute; top: 10px; right: 12px;
+      width: 12px; height: 12px;
+      background: var(--error); border-radius: 50%;
+      border: 2px solid var(--primary);
+    }
+    .top-bar-user { display: flex; align-items: center; gap: 14px; }
+    .top-bar-info { text-align: right; }
+    .tb-greeting { font-size: 13px; color: rgba(255,255,255,.8); font-family: Tajawal; }
+    .tb-name { font-size: 18px; font-weight: 700; color: #fff; font-family: Cairo; }
+    .user-avatar {
+      width: 54px; height: 54px; border-radius: 50%;
+      border: 2.5px solid var(--gold);
+      box-shadow: 0 4px 12px rgba(255,183,3,.3);
+      background: var(--primary-dark);
+      display: flex; align-items: center; justify-content: center;
+      font-family: Cairo; font-weight: 800; font-size: 20px; color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* Hero text */
+    .hero-text { padding: 12px 24px 20px; position: relative; z-index: 10; }
+    .hero-h1 { font-family: Cairo; font-size: 26px; font-weight: 800; color: #fff; line-height: 1.25; }
+    .hero-sub { font-size: 14px; color: rgba(255,255,255,.85); margin-top: 8px; }
+
+    /* ── CurrentCourseCard (from courses/widgets) ── */
+    .current-course-card {
+      margin: -20px 20px 0; position: relative; z-index: 20;
+      background: var(--elevated);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 24px; padding: 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.3);
+    }
+    .cc-label { font-size: 12px; color: var(--txt-m); margin-bottom: 6px; }
+    .cc-lesson { font-size: 12px; color: var(--primary-light); margin-top: 2px; }
+    .cc-title { font-family: Cairo; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .progress-bar { height: 6px; background: rgba(255,255,255,.1); border-radius: 3px; overflow: hidden; margin: 12px 0 8px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); border-radius: 3px; }
+    .progress-fill.gold { background: linear-gradient(90deg, var(--gold), var(--gold-dark)); }
+    .cc-row { display: flex; justify-content: space-between; align-items: center; }
+    .cc-pct { font-size: 13px; color: var(--primary-light); font-weight: 700; }
+
+    /* ── QuickActionCard ── */
+    .quick-row { display: flex; gap: 14px; padding: 28px 24px 0; position: relative; z-index: 10; }
+    .quick-card {
+      flex: 1; background: var(--surface);
+      border-radius: 28px; padding: 18px;
+      border: 1px solid rgba(255,255,255,.05);
+      box-shadow: 0 8px 20px rgba(0,0,0,.25);
+      display: flex; flex-direction: column;
+      align-items: center; gap: 8px; cursor: pointer;
+      transition: transform .15s ease;
+    }
+    .quick-card:active { transform: scale(.97); }
+    .qa-icon {
+      width: 56px; height: 56px; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .qa-icon i { width: 28px; height: 28px; }
+    .qa-label { font-family: Cairo; font-size: 14px; font-weight: 800; text-align: center; }
+
+    /* ── Section header ── */
+    .sec-hdr { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; margin-bottom: 14px; }
+    .sec-title { font-family: Cairo; font-size: 18px; font-weight: 800; }
+    .see-all { color: var(--primary-light); font-size: 13px; font-weight: 600; cursor: pointer; }
+
+    /* ── Course card (horizontal) ── */
+    .horiz { display: flex; gap: 14px; padding: 0 24px 14px; overflow-x: auto; scrollbar-width: none; }
+    .horiz::-webkit-scrollbar { display: none; }
+    .course-card-sm {
+      width: 190px; flex-shrink: 0;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 18px; overflow: hidden; cursor: pointer;
+    }
+    .thumb {
+      height: 110px;
+      background: linear-gradient(135deg, #111827, #1e293b);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .thumb i { width: 44px; height: 44px; color: rgba(255,255,255,.1); }
+    .thumb-badge { position: absolute; top: 10px; right: 10px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+    }
+    .chip-green { background: rgba(0,109,119,.2); border: 1px solid rgba(0,109,119,.3); color: var(--primary-light); }
+    .chip-gold  { background: rgba(255,183,3,.15); border: 1px solid rgba(255,183,3,.3); color: var(--gold); }
+    .chip-red   { background: rgba(230,57,70,.15); border: 1px solid rgba(230,57,70,.3); color: var(--error); }
+    .course-sm-body { padding: 12px; }
+    .course-sm-title { font-family: Cairo; font-size: 14px; font-weight: 700; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .course-sm-meta { display: flex; align-items: center; gap: 4px; color: var(--txt-m); font-size: 12px; }
+    .course-sm-meta i { width: 12px; height: 12px; }
+
+    /* ── Teacher card ── */
+    .teacher-card { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .teacher-card:last-child { border-bottom: none; }
+    .t-info { flex: 1; }
+    .t-name { font-family: Cairo; font-size: 15px; font-weight: 700; }
+    .t-sub  { font-size: 12px; color: var(--txt-m); margin-top: 2px; }
+    .t-cnt  { font-size: 12px; color: var(--primary-light); margin-top: 3px; }
+    .av {
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: Cairo; font-weight: 800; flex-shrink: 0;
+    }
+
+    /* ── Hadith card ── */
+    .hadith-card {
+      margin: 0 20px;
+      background: linear-gradient(135deg, rgba(0,109,119,.12), rgba(0,78,87,.08));
+      border: 1px solid rgba(0,109,119,.2);
+      border-radius: 20px; padding: 20px;
+    }
+    .hadith-icon { color: var(--gold); margin-bottom: 10px; }
+    .hadith-text { font-family: Cairo; font-size: 15px; line-height: 1.7; color: var(--txt-1); }
+    .hadith-source { font-size: 12px; color: var(--primary-light); margin-top: 8px; }
+
+    /* ─── Onboarding Card ─── */
+    .ob-card {
+      background: var(--surface);
+      border-radius: 40px; padding: 32px;
+      margin: 0 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.2);
+    }
+    .ob-icon-wrap {
+      width: 96px; height: 96px; border-radius: 50%;
+      background: rgba(0,109,119,.08);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 28px;
+    }
+    .ob-icon-wrap i { width: 44px; height: 44px; color: var(--primary); }
+    .ob-title { font-family: Cairo; font-size: 22px; font-weight: 800; text-align: center; color: var(--primary); margin-bottom: 12px; }
+    .ob-desc  { font-size: 15px; color: var(--txt-2); text-align: center; line-height: 1.7; }
+    .indicators { display: flex; gap: 8px; justify-content: center; margin: 24px 0; }
+    .dot { width: 8px; height: 8px; border-radius: 4px; background: rgba(255,255,255,.2); transition: all .3s; }
+    .dot.active { width: 24px; background: var(--gold); }
+    .btn-primary {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: #000; font-family: Cairo; font-size: 16px; font-weight: 700;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 6px 20px rgba(255,183,3,.25);
+      transition: transform .1s;
+    }
+    .btn-primary i { width: 18px; height: 18px; }
+    .btn-primary:active { transform: scale(.98); }
+
+    /* ── Role card (from role_card_widget.dart) ── */
+    .role-card {
+      background: var(--surface);
+      border-radius: 24px; padding: 20px;
+      border: 1px solid rgba(255,255,255,.07);
+      display: flex; align-items: center; gap: 16px;
+      cursor: pointer; transition: all .2s;
+      margin-bottom: 16px;
+    }
+    .role-card:hover { border-color: var(--primary); background: rgba(0,109,119,.1); }
+    .role-icon {
+      width: 64px; height: 64px; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .role-icon i { width: 30px; height: 30px; }
+    .role-name { font-family: Cairo; font-size: 18px; font-weight: 800; color: var(--primary); }
+    .role-sub  { font-size: 13px; color: var(--txt-m); margin-top: 4px; }
+    .role-arr {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .role-arr i { width: 18px; height: 18px; }
+
+    /* ── Login form ── */
+    .brand-logo {
+      width: 80px; height: 80px; border-radius: 24px;
+      background: rgba(0,109,119,.12);
+      border: 1.5px solid rgba(0,109,119,.25);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .brand-logo i { width: 44px; height: 44px; color: var(--primary); }
+    .login-title { font-family: Cairo; font-size: 32px; font-weight: 800; color: var(--primary); text-align: center; }
+    .login-sub   { font-size: 15px; color: var(--txt-2); text-align: center; margin-top: 6px; }
+    .field-label { font-size: 14px; color: var(--txt-2); font-weight: 500; margin-bottom: 8px; }
+    .input-wrap { position: relative; margin-bottom: 16px; }
+    .input-mock {
+      width: 100%; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 14px;
+      padding: 14px 44px 14px 16px;
+      color: var(--txt-2); font-family: Tajawal; font-size: 15px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .input-mock i { width: 18px; height: 18px; color: var(--txt-m); flex-shrink: 0; }
+    .forgot { text-align: left; color: var(--primary-light); font-size: 13px; margin-top: 4px; cursor: pointer; }
+    .divider { display: flex; align-items: center; gap: 12px; color: var(--txt-m); font-size: 13px; margin: 20px 0; }
+    .divider::before, .divider::after { content:''; flex:1; height:1px; background:rgba(255,255,255,.08); }
+    .register-link { text-align: center; color: var(--txt-2); font-size: 14px; }
+    .register-link span { color: var(--primary-light); font-weight: 700; cursor: pointer; }
+
+    /* ── FloatingBottomNav (from floating_bottom_nav.dart) ── */
+    .bottom-nav {
+      position: absolute; bottom: 16px; left: 16px; right: 16px;
+      height: 72px;
+      background: rgba(36,52,71,.92);
+      backdrop-filter: blur(16px);
+      border-radius: 28px;
+      border: .5px solid rgba(47,62,90,.4);
+      box-shadow: 0 8px 30px rgba(0,0,0,.06);
+      display: flex; align-items: center;
+      justify-content: space-around;
+      z-index: 150;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center;
+      width: 60px; cursor: pointer;
+    }
+    .nav-icon-wrap {
+      padding: 8px; border-radius: 14px;
+      transition: all .3s; display: flex;
+    }
+    .nav-item.active .nav-icon-wrap { background: rgba(0,109,119,.1); }
+    .nav-item i { width: 22px; height: 22px; color: var(--txt-m); }
+    .nav-item.active i { color: var(--primary); }
+    .nav-label { font-size: 9px; font-weight: 700; font-family: Tajawal; color: var(--primary); margin-top: 1px; display: none; }
+    .nav-item.active .nav-label { display: block; }
+
+    /* ── My Courses screen ── */
+    .section-header-curved {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      padding: 54px 24px 24px; flex-shrink: 0;
+      border-bottom-left-radius: 28px; border-bottom-right-radius: 28px;
+    }
+    .filter-tabs { display: flex; gap: 8px; padding: 18px 20px 0; overflow-x: auto; scrollbar-width: none; }
+    .filter-tabs::-webkit-scrollbar { display: none; }
+    .ftab {
+      white-space: nowrap; padding: 8px 18px; border-radius: 20px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      background: rgba(255,255,255,.07); color: var(--txt-m);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .ftab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .enrolled-card {
+      margin: 16px 20px 0;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 20px; padding: 16px;
+    }
+    .ec-top { display: flex; gap: 14px; margin-bottom: 14px; }
+    .ec-thumb {
+      width: 70px; height: 70px; border-radius: 14px;
+      background: linear-gradient(135deg, #111827, #1e293b);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .ec-thumb i { width: 32px; height: 32px; color: rgba(255,255,255,.15); }
+    .ec-info { flex: 1; }
+    .ec-title { font-family: Cairo; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .ec-teacher { font-size: 12px; color: var(--txt-m); }
+    .ec-prog { display: flex; align-items: center; gap: 10px; }
+    .ec-pct { font-size: 13px; color: var(--primary-light); font-weight: 700; min-width: 36px; text-align: left; }
+
+    /* ── Course Details ── */
+    .cd-header {
+      height: 200px;
+      background: linear-gradient(150deg, var(--primary), var(--primary-dark));
+      display: flex; flex-direction: column;
+      justify-content: flex-end; padding: 0 20px 20px;
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .cd-back { position: absolute; top: 14px; right: 14px; z-index: 10; }
+    .stats-row {
+      display: flex; margin: 0 20px;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px; overflow: hidden;
+    }
+    .stat-col { flex: 1; padding: 14px 8px; display: flex; flex-direction: column; align-items: center; border-left: 1px solid rgba(255,255,255,.06); }
+    .stat-col:last-child { border-left: none; }
+    .stat-val { font-family: Cairo; font-size: 20px; font-weight: 800; color: var(--gold); }
+    .stat-lbl { font-size: 11px; color: var(--txt-m); margin-top: 3px; }
+    .lesson-row { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .lesson-num {
+      width: 36px; height: 36px; border-radius: 12px;
+      background: rgba(0,109,119,.15); border: 1px solid rgba(0,109,119,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: var(--primary-light); flex-shrink: 0;
+    }
+    .lesson-num.locked { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.08); color: var(--txt-m); }
+    .lesson-num.current { background: rgba(255,183,3,.15); border-color: rgba(255,183,3,.3); color: var(--gold); }
+    .l-info { flex: 1; }
+    .l-title { font-size: 14px; font-weight: 600; }
+    .l-dur   { font-size: 12px; color: var(--txt-m); margin-top: 2px; }
+
+    /* ── Notifications ── */
+    .notif-item { display: flex; align-items: flex-start; gap: 14px; padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,.05); position: relative; }
+    .notif-item.unread::before { content:''; position:absolute; right:14px; top:20px; width:8px; height:8px; border-radius:50%; background: var(--primary-light); }
+    .notif-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .notif-icon i { width: 22px; height: 22px; }
+    .notif-body { flex: 1; }
+    .notif-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .notif-txt   { font-size: 13px; color: var(--txt-m); line-height: 1.5; }
+    .notif-time  { font-size: 11px; color: var(--txt-m); margin-top: 4px; }
+
+    /* ── Inbox ── */
+    .inbox-item { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,.05); cursor: pointer; }
+    .inbox-meta { flex: 1; }
+    .inbox-name { font-family: Cairo; font-size: 15px; font-weight: 700; }
+    .inbox-preview { font-size: 13px; color: var(--txt-m); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+    .inbox-time  { font-size: 11px; color: var(--txt-m); }
+    .unread-badge { width: 20px; height: 20px; border-radius: 10px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; }
+
+    /* ── Quiz ── */
+    .quiz-progress-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .quiz-pct { font-size: 13px; color: rgba(255,255,255,.8); white-space: nowrap; }
+    .question-card { margin: 18px; background: var(--surface); border: 1px solid rgba(255,255,255,.06); border-radius: 20px; padding: 20px; }
+    .q-num  { font-size: 12px; color: var(--primary-light); font-weight: 600; margin-bottom: 8px; }
+    .q-text { font-family: Cairo; font-size: 18px; font-weight: 700; line-height: 1.5; margin-bottom: 20px; }
+    .option {
+      padding: 14px 16px; border-radius: 14px;
+      border: 1.5px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      margin-bottom: 10px; cursor: pointer;
+      display: flex; align-items: center; gap: 12px;
+      transition: all .2s;
+    }
+    .option.sel  { border-color: var(--primary); background: rgba(0,109,119,.15); }
+    .option.ok   { border-color: var(--success); background: rgba(45,198,83,.1); }
+    .option.wrong{ border-color: var(--error);   background: rgba(230,57,70,.1); }
+    .opt-letter {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,.07); display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+    }
+    .option.sel   .opt-letter { background: var(--primary); }
+    .option.ok    .opt-letter { background: var(--success); }
+
+    /* ── Profile ── */
+    .profile-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      padding: 54px 20px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      border-bottom-left-radius: 36px; border-bottom-right-radius: 36px;
+      flex-shrink: 0;
+    }
+    .profile-av { width: 80px; height: 80px; font-size: 28px; }
+    .p-name { font-family: Cairo; font-size: 22px; font-weight: 800; }
+    .p-email { color: rgba(255,255,255,.8); font-size: 13px; }
+    .p-stats { display: flex; gap: 28px; margin-top: 10px; }
+    .ps-item { text-align: center; }
+    .ps-val { font-family: Cairo; font-size: 22px; font-weight: 800; color: var(--gold); }
+    .ps-lbl { font-size: 12px; color: rgba(255,255,255,.8); }
+    .settings-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.05); cursor: pointer;
+    }
+    .si-icon {
+      width: 42px; height: 42px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .si-icon i { width: 20px; height: 20px; }
+    .si-label { flex: 1; font-size: 15px; font-weight: 600; }
+    .si-arr i  { width: 16px; height: 16px; color: var(--txt-m); }
+    .toggle {
+      width: 44px; height: 24px; border-radius: 12px; background: var(--primary); position: relative;
+    }
+    .toggle::after { content:''; position:absolute; width:20px; height:20px; border-radius:50%; background:#fff; top:2px; right:2px; transition:right .2s; }
+    .toggle.off { background: rgba(255,255,255,.15); }
+    .toggle.off::after { right: calc(100% - 22px); }
+
+    /* ── Payment ── */
+    .pay-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      padding: 54px 20px 28px;
+      border-bottom-left-radius: 32px; border-bottom-right-radius: 32px;
+      flex-shrink: 0;
+    }
+    .pay-amount { font-family: Cairo; font-size: 42px; font-weight: 900; color: var(--gold); display: flex; align-items: baseline; gap: 8px; }
+    .pay-currency { font-size: 22px; font-weight: 600; }
+    .pay-item-name { color: rgba(255,255,255,.8); font-size: 15px; margin-top: 6px; }
+    .pm-row { display: flex; gap: 10px; margin: 16px 20px 0; }
+    .pm-card {
+      flex: 1; padding: 14px 8px;
+      background: var(--surface); border: 1.5px solid rgba(255,255,255,.06);
+      border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;
+    }
+    .pm-card.sel { border-color: var(--primary); background: rgba(0,109,119,.15); }
+    .pm-card i { width: 26px; height: 26px; }
+    .pm-lbl { font-size: 12px; font-weight: 600; }
+    .order-card { margin: 14px 20px; background: var(--surface); border: 1px solid rgba(255,255,255,.06); border-radius: 18px; padding: 16px; }
+    .order-title { font-family: Cairo; font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+    .order-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 14px; }
+    .order-total { border-top: 1px solid rgba(255,255,255,.08); padding-top: 12px; font-weight: 700; color: var(--gold); font-size: 16px; }
+
+    /* ── Admin dashboard ── */
+    .admin-header {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      padding: 54px 20px 24px;
+      border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
+      flex-shrink: 0;
+    }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px; }
+    .stat-card { background: var(--surface); border: 1px solid rgba(255,255,255,.06); border-radius: 18px; padding: 18px; }
+    .sc-icon { width: 42px; height: 42px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+    .sc-icon i { width: 22px; height: 22px; }
+    .sc-val { font-family: Cairo; font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+    .sc-lbl { font-size: 13px; color: var(--txt-m); }
+    .sc-chg { font-size: 12px; display: flex; align-items: center; gap: 4px; margin-top: 6px; }
+    .sc-chg i { width: 12px; height: 12px; }
+    .sc-chg.up { color: var(--success); }
+
+    /* Admin bottom nav */
+    .admin-nav { position: absolute; bottom: 16px; left: 16px; right: 16px; height: 72px; background: rgba(36,52,71,.92); backdrop-filter: blur(16px); border-radius: 28px; border: .5px solid rgba(47,62,90,.4); display: flex; align-items: center; justify-content: space-around; z-index: 150; }
+
+    /* ── Supervisor ── */
+    .sup-student-card { display: flex; align-items: center; gap: 14px; margin: 0 20px 12px; background: var(--surface); border: 1px solid rgba(255,255,255,.06); border-radius: 18px; padding: 16px; }
+    .sup-info { flex: 1; }
+    .sup-name { font-family: Cairo; font-size: 15px; font-weight: 700; }
+    .sup-course { font-size: 12px; color: var(--txt-m); margin-bottom: 8px; }
+    .sup-prog { display: flex; align-items: center; gap: 10px; }
+    .sup-pct { font-size: 12px; color: var(--primary-light); font-weight: 700; }
+
+    /* ── Certificates ── */
+    .cert-card {
+      margin: 14px 20px 0;
+      background: linear-gradient(135deg, var(--elevated), var(--surface));
+      border: 1px solid rgba(255,183,3,.15);
+      border-radius: 20px; padding: 20px;
+      position: relative; overflow: hidden;
+    }
+    .cert-seal { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,183,3,.1); border: 2px solid rgba(255,183,3,.3); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+    .cert-seal i { width: 30px; height: 30px; color: var(--gold); }
+    .cert-title { font-family: Cairo; font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+    .cert-course { color: var(--txt-m); font-size: 14px; margin-bottom: 12px; }
+    .cert-date { display: flex; align-items: center; gap: 6px; color: var(--gold); font-size: 13px; }
+    .cert-date i { width: 14px; height: 14px; }
+    .cert-dl { margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,183,3,.1); border: 1px solid rgba(255,183,3,.2); color: var(--gold); font-weight: 700; font-size: 14px; padding: 12px; border-radius: 12px; cursor: pointer; }
+    .cert-dl i { width: 18px; height: 18px; }
+
+    /* ── Downloads ── */
+    .dl-item { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .dl-icon { width: 48px; height: 48px; border-radius: 14px; background: rgba(0,109,119,.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .dl-icon i { width: 24px; height: 24px; color: var(--primary-light); }
+    .dl-info { flex: 1; }
+    .dl-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .dl-sub   { font-size: 12px; color: var(--txt-m); }
+
+    /* ── Live sessions ── */
+    .live-badge { display: flex; align-items: center; gap: 6px; background: rgba(230,57,70,.15); border: 1px solid rgba(230,57,70,.3); border-radius: 20px; padding: 6px 14px; color: var(--error); font-size: 13px; font-weight: 700; }
+    .live-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--error); animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100% { transform:scale(1); opacity:1; } 50% { transform:scale(1.4); opacity:.7; } }
+    .live-card { margin: 14px 20px 0; background: var(--surface); border: 1px solid rgba(255,255,255,.06); border-radius: 20px; padding: 18px; }
+    .join-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--error), #c1121f); color: #fff; font-weight: 700; font-size: 15px; padding: 12px; border-radius: 14px; cursor: pointer; border: none; width: 100%; margin-top: 14px; font-family: Tajawal; }
+    .join-btn i { width: 18px; height: 18px; }
+
+    /* ── Books ── */
+    .book-card { display: flex; gap: 14px; align-items: center; margin: 0 20px 14px; background: var(--surface); border: 1px solid rgba(255,255,255,.06); border-radius: 18px; padding: 16px; }
+    .book-thumb { width: 60px; height: 80px; border-radius: 10px; background: linear-gradient(135deg, var(--primary-dark), var(--elevated)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .book-thumb i { width: 28px; height: 28px; color: var(--gold); }
+    .book-info { flex: 1; }
+    .book-title  { font-family: Cairo; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .book-author { font-size: 12px; color: var(--txt-m); margin-bottom: 6px; }
+    .book-price  { font-size: 14px; font-weight: 700; color: var(--gold); }
+    .book-free   { font-size: 14px; font-weight: 700; color: var(--success); }
+
+    /* ── Success screen ── */
+    .success-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 40px 24px; text-align: center; }
+    .success-icon { width: 100px; height: 100px; border-radius: 50%; background: rgba(45,198,83,.12); border: 2px solid rgba(45,198,83,.3); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; animation: bounceIn .5s ease; }
+    .success-icon i { width: 50px; height: 50px; color: var(--success); }
+    @keyframes bounceIn { 0% { transform:scale(0); opacity:0; } 60% { transform:scale(1.1); } 100% { transform:scale(1); opacity:1; } }
+    .success-title { font-family: Cairo; font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+    .success-desc  { color: var(--txt-m); font-size: 15px; line-height: 1.7; margin-bottom: 32px; }
+    .btn-outline { width: 100%; padding: 13px; border: 1.5px solid rgba(255,255,255,.15); border-radius: 14px; color: var(--txt-1); font-family: Cairo; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; cursor: pointer; }
+    .btn-outline i { width: 18px; height: 18px; }
+
+    /* ── Generic section separator ── */
+    .sep { height: 8px; background: rgba(255,255,255,.02); margin: 6px 0; }
+
+    /* generic card */
+    .card { background: var(--surface); border: 1px solid rgba(255,255,255,.06); border-radius: 18px; overflow: hidden; }
+
+    /* empty state */
+    .empty { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; color:var(--txt-m); text-align:center; gap:12px; }
+    .empty i { width:52px; height:52px; opacity:.3; }
+
+    /* assignments */
+    .assign-card { margin: 0 20px 12px; background: var(--surface); border: 1px solid rgba(255,255,255,.06); border-radius: 18px; padding: 16px; }
+    .assign-title { font-family: Cairo; font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .assign-meta  { font-size: 13px; color: var(--txt-m); display: flex; align-items: center; gap: 6px; }
+    .assign-meta i { width: 14px; height: 14px; }
+  </style>
+</head>
+<body>
+
+  <div class="page-title">🎓 Vantage Academy</div>
+  <p class="page-sub">معاينة تفاعلية مطابقة 100% لجميع شاشات التطبيق</p>
+
+  <!-- ── TABS ── -->
+  <div class="tabs">
+    <button class="tab active" onclick="go('onboarding')">الترحيب</button>
+    <button class="tab" onclick="go('role')">اختيار الدور</button>
+    <button class="tab" onclick="go('login')">تسجيل الدخول</button>
+    <button class="tab" onclick="go('home')">الرئيسية</button>
+    <button class="tab" onclick="go('mycourses')">دوراتي</button>
+    <button class="tab" onclick="go('detail')">تفاصيل الدورة</button>
+    <button class="tab" onclick="go('search')">البحث</button>
+    <button class="tab" onclick="go('quiz')">الاختبار</button>
+    <button class="tab" onclick="go('inbox')">الرسائل</button>
+    <button class="tab" onclick="go('notifications')">الإشعارات</button>
+    <button class="tab" onclick="go('downloads')">التنزيلات</button>
+    <button class="tab" onclick="go('books')">المكتبة</button>
+    <button class="tab" onclick="go('certificates')">الشهادات</button>
+    <button class="tab" onclick="go('live')">البث المباشر</button>
+    <button class="tab" onclick="go('assignments')">الواجبات</button>
+    <button class="tab" onclick="go('profile')">حسابي</button>
+    <button class="tab" onclick="go('payment')">الدفع</button>
+    <button class="tab" onclick="go('admin')">لوحة الإدارة</button>
+    <button class="tab" onclick="go('supervisor')">المشرف</button>
+    <button class="tab" onclick="go('success')">نجاح العملية</button>
+  </div>
+
+  <!-- ══════════════════ PHONE ══════════════════ -->
+  <div class="phone">
+    <div class="di"><div class="di-cam"></div><div class="di-dot"></div></div>
+
+    <!-- Status Bar -->
+    <div class="statusbar">
+      <span class="sb-time">11:30</span>
+      <div class="sb-icons">
+        <i data-lucide="signal"></i>
+        <i data-lucide="wifi"></i>
+        <div class="batt"><div class="batt-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="screens">
+
+      <!-- ══════════════ ONBOARDING ══════════════ -->
+      <div class="screen active" id="s-onboarding">
+        <div class="auth-bg"></div>
+        <div class="scroller" style="display:flex; flex-direction:column; justify-content:center; align-items:center; padding: 32px 0;">
+          <!-- PageView slide 0 -->
+          <div class="ob-card" id="ob-card">
+            <div class="ob-icon-wrap" id="ob-icon">
+              <i data-lucide="book-open"></i>
+            </div>
+            <div class="ob-title" id="ob-title">تعلم العقيدة الصحيحة</div>
+            <div class="ob-desc" id="ob-desc">دروس منهجية مبسطة في العقيدة والفقه والسيرة النبوية</div>
+            <div class="indicators">
+              <div class="dot active" id="d0"></div>
+              <div class="dot" id="d1"></div>
+              <div class="dot" id="d2"></div>
+            </div>
+            <button class="btn-primary" id="ob-btn" onclick="obNext()">
+              <span id="ob-btn-txt">التالي</span>
+              <i data-lucide="arrow-left"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ ROLE SELECTOR ══════════════ -->
+      <div class="screen" id="s-role">
+        <div class="auth-bg"></div>
+        <div class="scroller" style="padding: 54px 24px 20px; position: relative; z-index: 10;">
+          <!-- Brand Logo -->
+          <div class="brand-logo"><i data-lucide="graduation-cap"></i></div>
+          <div style="text-align:center; margin-bottom: 6px;">
+            <span style="font-family:Cairo; font-size:24px; font-weight:800; color:var(--primary); letter-spacing:1px;">VANTAGE ACADEMY</span>
+          </div>
+          <div style="text-align:center; color:var(--txt-2); font-size:15px; margin-bottom:40px;">منصة تعليمية احترافية للجيل القادم</div>
+
+          <!-- طالب -->
+          <div class="role-card" onclick="go('login')">
+            <div class="role-icon" style="background: linear-gradient(135deg, rgba(0,109,119,.12), rgba(0,109,119,.04));">
+              <i data-lucide="graduation-cap" style="color:var(--primary);"></i>
+            </div>
+            <div style="flex:1;">
+              <div class="role-name">طالب</div>
+              <div class="role-sub">الوصول للدورات والاختبارات</div>
+            </div>
+            <div class="role-arr" style="background: rgba(0,109,119,.06);">
+              <i data-lucide="chevron-left" style="color:rgba(0,109,119,.5);"></i>
+            </div>
+          </div>
+          <!-- مشرف -->
+          <div class="role-card" onclick="go('login')">
+            <div class="role-icon" style="background: linear-gradient(135deg, rgba(255,183,3,.12), rgba(255,183,3,.04));">
+              <i data-lucide="users" style="color:var(--gold);"></i>
+            </div>
+            <div style="flex:1;">
+              <div class="role-name" style="color:var(--gold);">مشرف</div>
+              <div class="role-sub">متابعة الطلاب والدعم</div>
+            </div>
+            <div class="role-arr" style="background: rgba(255,183,3,.06);">
+              <i data-lucide="chevron-left" style="color:rgba(255,183,3,.5);"></i>
+            </div>
+          </div>
+          <!-- مدير -->
+          <div class="role-card" onclick="go('login')">
+            <div class="role-icon" style="background: linear-gradient(135deg, rgba(0,78,87,.2), rgba(0,78,87,.04));">
+              <i data-lucide="shield" style="color:var(--primary-dark);"></i>
+            </div>
+            <div style="flex:1;">
+              <div class="role-name" style="color:var(--primary-dark);">مدير</div>
+              <div class="role-sub">إدارة المحتوى والنظام</div>
+            </div>
+            <div class="role-arr" style="background: rgba(0,78,87,.06);">
+              <i data-lucide="chevron-left" style="color:rgba(0,78,87,.5);"></i>
+            </div>
+          </div>
+
+          <div style="text-align:center; color:var(--txt-m); font-size:12px; margin-top: 20px; letter-spacing:.5px;">
+            Empowering the next generation of learners
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ LOGIN ══════════════ -->
+      <div class="screen" id="s-login">
+        <div class="auth-bg"></div>
+        <div class="scroller" style="padding: 54px 24px; position: relative; z-index: 10;">
+          <div class="brand-logo"><i data-lucide="graduation-cap"></i></div>
+          <div class="login-title">تسجيل الدخول</div>
+          <div class="login-sub">أدخل بريدك الإلكتروني للمتابعة</div>
+
+          <div style="margin-top: 32px;">
+            <div class="field-label">البريد الإلكتروني</div>
+            <div class="input-mock">
+              <i data-lucide="mail"></i>
+              <span>student@vantage.com</span>
+            </div>
+            <div class="field-label">كلمة المرور</div>
+            <div class="input-mock">
+              <i data-lucide="lock"></i>
+              <span style="color:var(--txt-m);">••••••••••</span>
+            </div>
+            <div class="forgot">نسيت كلمة المرور؟</div>
+            <div style="height:20px;"></div>
+            <button class="btn-primary" onclick="go('home')">
+              <i data-lucide="log-in"></i>
+              تسجيل الدخول
+            </button>
+            <div class="divider">أو</div>
+            <div class="register-link">ليس لديك حساب؟ <span onclick="go('onboarding')">إنشاء حساب</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ STUDENT HOME ══════════════ -->
+      <div class="screen" id="s-home">
+        <!-- CurvedHeaderBackground -->
+        <div class="curve-header"></div>
+
+        <div class="scroller" style="position:relative; z-index:10;">
+          <!-- CustomTopBar -->
+          <div class="top-bar">
+            <div class="top-bar-actions">
+              <div class="glass-btn" onclick="go('notifications')">
+                <div class="notif-dot"></div>
+                <i data-lucide="bell"></i>
+              </div>
+              <div class="glass-btn" onclick="go('search')">
+                <i data-lucide="search"></i>
+              </div>
+            </div>
+            <div class="top-bar-user">
+              <div class="top-bar-info">
+                <div class="tb-greeting">مرحباً بك مجدداً 👋</div>
+                <div class="tb-name">طالب العلم</div>
+              </div>
+              <div class="user-avatar">ط</div>
+            </div>
+          </div>
+
+          <!-- Hero text -->
+          <div class="hero-text">
+            <div class="hero-h1">اكتشف، تعلم، وارتقِ</div>
+            <div class="hero-sub">واصل رحلتك التعليمية المتميزة مع Vantage Academy</div>
+          </div>
+
+          <!-- CurrentCourseCard -->
+          <div class="current-course-card" onclick="go('detail')">
+            <div class="cc-label">📚 تابع من حيث توقفت</div>
+            <div class="cc-title">دورة Flutter المتقدمة</div>
+            <div class="cc-lesson">متابعة التعلم</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:65%;"></div></div>
+            <div class="cc-row">
+              <div class="cc-pct">65%</div>
+              <button class="btn-primary" style="width:auto; padding:10px 18px; font-size:14px;">
+                <i data-lucide="play"></i> متابعة
+              </button>
+            </div>
+          </div>
+
+          <!-- QuickActionCards (3 cards — with Showcase keys) -->
+          <div class="quick-row">
+            <div class="quick-card" onclick="go('mycourses')">
+              <div class="qa-icon" style="background:linear-gradient(135deg,rgba(0,109,119,.15),rgba(0,109,119,.05)); border:1.5px solid rgba(0,109,119,.2);">
+                <i data-lucide="book-open" style="color:var(--primary);"></i>
+              </div>
+              <div class="qa-label">دوراتي</div>
+            </div>
+            <div class="quick-card" onclick="go('downloads')">
+              <div class="qa-icon" style="background:linear-gradient(135deg,rgba(255,183,3,.15),rgba(255,183,3,.05)); border:1.5px solid rgba(255,183,3,.2);">
+                <i data-lucide="download" style="color:var(--gold);"></i>
+              </div>
+              <div class="qa-label">التنزيلات</div>
+            </div>
+            <div class="quick-card" onclick="go('certificates')">
+              <div class="qa-icon" style="background:linear-gradient(135deg,rgba(0,78,87,.2),rgba(0,78,87,.05)); border:1.5px solid rgba(0,78,87,.2);">
+                <i data-lucide="award" style="color:var(--primary-dark);"></i>
+              </div>
+              <div class="qa-label">الشهادات</div>
+            </div>
+          </div>
+
+          <div style="height: 32px;"></div>
+
+          <!-- HomeLatestCoursesSection -->
+          <div class="sec-hdr">
+            <div class="sec-title">أحدث الدورات</div>
+            <div class="see-all">عرض الكل ←</div>
+          </div>
+          <div class="horiz">
+            <div class="course-card-sm" onclick="go('detail')">
+              <div class="thumb">
+                <div class="thumb-badge"><div class="chip chip-gold">عام</div></div>
+                <i data-lucide="book-open"></i>
+              </div>
+              <div class="course-sm-body">
+                <div class="course-sm-title">Flutter المتقدمة</div>
+                <div class="course-sm-meta"><i data-lucide="clock"></i> 20 ساعة</div>
+              </div>
+            </div>
+            <div class="course-card-sm" onclick="go('detail')">
+              <div class="thumb" style="background:linear-gradient(135deg,#0d1117,#1a1a2e);">
+                <div class="thumb-badge"><div class="chip chip-gold">برمجة</div></div>
+                <i data-lucide="code-2"></i>
+              </div>
+              <div class="course-sm-body">
+                <div class="course-sm-title">أساسيات Dart</div>
+                <div class="course-sm-meta"><i data-lucide="clock"></i> 15 ساعة</div>
+              </div>
+            </div>
+            <div class="course-card-sm" onclick="go('detail')">
+              <div class="thumb" style="background:linear-gradient(135deg,#0d1b2a,#1b4332);">
+                <div class="thumb-badge"><div class="chip chip-gold">UI</div></div>
+                <i data-lucide="layout"></i>
+              </div>
+              <div class="course-sm-body">
+                <div class="course-sm-title">تصميم واجهات UI</div>
+                <div class="course-sm-meta"><i data-lucide="clock"></i> 12 ساعة</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <!-- HomeTeachersSection -->
+          <div class="sec-hdr" style="padding-top: 16px;">
+            <div class="sec-title">أبرز المدرسين</div>
+            <div class="see-all">عرض الكل ←</div>
+          </div>
+          <div class="card" style="margin: 0 20px;">
+            <div class="teacher-card">
+              <div class="av" style="width:46px;height:46px;background:rgba(0,109,119,.1);border:2px solid var(--gold);color:var(--gold);font-size:16px;">مح</div>
+              <div class="t-info">
+                <div class="t-name">محمد محمود</div>
+                <div class="t-sub">مطوّر Flutter متقدم</div>
+                <div class="t-cnt">3 دورات</div>
+              </div>
+              <div class="chip chip-gold">⭐ 4.9</div>
+            </div>
+            <div class="teacher-card">
+              <div class="av" style="width:46px;height:46px;background:rgba(0,109,119,.1);border:2px solid var(--gold);color:var(--gold);font-size:16px;">أح</div>
+              <div class="t-info">
+                <div class="t-name">أحمد السيد</div>
+                <div class="t-sub">مصمم UI/UX</div>
+                <div class="t-cnt">5 دورات</div>
+              </div>
+              <div class="chip chip-gold">⭐ 4.8</div>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <!-- HomeBooksSection -->
+          <div class="sec-hdr" style="padding-top: 16px;">
+            <div class="sec-title">أحدث الكتب</div>
+            <div class="see-all">عرض الكل ←</div>
+          </div>
+          <div style="padding: 0 20px 14px;">
+            <div class="book-card" onclick="go('books')" style="margin: 0; border-radius: 16px;">
+              <div class="book-thumb"><i data-lucide="book-open"></i></div>
+              <div class="book-info">
+                <div class="book-title">Flutter Complete Guide</div>
+                <div class="book-author">محمد محمود</div>
+                <div class="book-free">مجاني ✓</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HadithOfTheDay -->
+          <div style="padding: 0 20px 20px;">
+            <div class="hadith-card">
+              <div class="hadith-icon"><i data-lucide="quote" style="width:24px;height:24px;"></i></div>
+              <div class="hadith-text">«مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ»</div>
+              <div class="hadith-source">رواه مسلم</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FloatingBottomNav — items: الرئيسية / تعلمي / الإشعارات / الإعدادات -->
+        <div class="bottom-nav">
+          <div class="nav-item active" onclick="go('home')">
+            <div class="nav-icon-wrap"><i data-lucide="home"></i></div>
+            <div class="nav-label">الرئيسية</div>
+          </div>
+          <div class="nav-item" onclick="go('mycourses')">
+            <div class="nav-icon-wrap"><i data-lucide="book-open"></i></div>
+            <div class="nav-label">تعلمي</div>
+          </div>
+          <div class="nav-item" onclick="go('notifications')">
+            <div class="nav-icon-wrap"><i data-lucide="bell"></i></div>
+            <div class="nav-label">الإشعارات</div>
+          </div>
+          <div class="nav-item" onclick="go('profile')">
+            <div class="nav-icon-wrap"><i data-lucide="settings"></i></div>
+            <div class="nav-label">الإعدادات</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ MY COURSES ══════════════ -->
+      <div class="screen" id="s-mycourses">
+        <div class="section-header-curved">
+          <div style="font-family:Cairo;font-size:24px;font-weight:800;">دوراتي</div>
+          <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:4px;">تابع تقدمك في الدورات المسجّلة</div>
+        </div>
+        <div class="filter-tabs">
+          <div class="ftab active">الكل</div>
+          <div class="ftab">جارية</div>
+          <div class="ftab">مكتملة</div>
+          <div class="ftab">غير مبدوءة</div>
+        </div>
+        <div class="scroller">
+          <div class="enrolled-card" onclick="go('detail')">
+            <div class="ec-top">
+              <div class="ec-thumb"><i data-lucide="book-open"></i></div>
+              <div class="ec-info">
+                <div class="ec-title">Flutter المتقدمة</div>
+                <div class="ec-teacher">محمد محمود</div>
+              </div>
+              <div class="chip chip-green">جارية</div>
+            </div>
+            <div class="ec-prog">
+              <div class="progress-bar" style="flex:1;"><div class="progress-fill" style="width:65%;"></div></div>
+              <div class="ec-pct">65%</div>
+            </div>
+          </div>
+          <div class="enrolled-card" onclick="go('detail')">
+            <div class="ec-top">
+              <div class="ec-thumb"><i data-lucide="code-2"></i></div>
+              <div class="ec-info">
+                <div class="ec-title">أساسيات Dart</div>
+                <div class="ec-teacher">أحمد السيد</div>
+              </div>
+              <div class="chip chip-gold">100%</div>
+            </div>
+            <div class="ec-prog">
+              <div class="progress-bar" style="flex:1;"><div class="progress-fill gold" style="width:100%;"></div></div>
+              <div class="ec-pct" style="color:var(--gold);">مكتمل</div>
+            </div>
+          </div>
+          <div class="enrolled-card" onclick="go('detail')">
+            <div class="ec-top">
+              <div class="ec-thumb"><i data-lucide="layout"></i></div>
+              <div class="ec-info">
+                <div class="ec-title">تصميم واجهات UI</div>
+                <div class="ec-teacher">سارة حسن</div>
+              </div>
+              <div class="chip chip-red">0%</div>
+            </div>
+            <div class="ec-prog">
+              <div class="progress-bar" style="flex:1;"><div class="progress-fill" style="width:0%;"></div></div>
+              <div class="ec-pct" style="color:var(--txt-m);">جديدة</div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item" onclick="go('home')"><div class="nav-icon-wrap"><i data-lucide="home"></i></div><div class="nav-label">الرئيسية</div></div>
+          <div class="nav-item active" onclick="go('mycourses')"><div class="nav-icon-wrap"><i data-lucide="book-open"></i></div><div class="nav-label">تعلمي</div></div>
+          <div class="nav-item" onclick="go('notifications')"><div class="nav-icon-wrap"><i data-lucide="bell"></i></div><div class="nav-label">الإشعارات</div></div>
+          <div class="nav-item" onclick="go('profile')"><div class="nav-icon-wrap"><i data-lucide="settings"></i></div><div class="nav-label">الإعدادات</div></div>
+        </div>
+      </div>
+
+      <!-- ══════════════ COURSE DETAILS ══════════════ -->
+      <div class="screen" id="s-detail">
+        <div class="cd-header">
+          <div class="cd-back"><div class="glass-btn" onclick="go('home')"><i data-lucide="arrow-right"></i></div></div>
+          <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <div class="chip chip-gold">Flutter</div>
+            <div class="chip chip-green">متقدم</div>
+          </div>
+          <div style="font-family:Cairo;font-size:22px;font-weight:800;">دورة Flutter المتقدمة</div>
+          <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:6px;">👨‍🏫 محمد محمود</div>
+        </div>
+        <div class="scroller">
+          <!-- Stats row -->
+          <div class="stats-row">
+            <div class="stat-col"><div class="stat-val">25</div><div class="stat-lbl">درس</div></div>
+            <div class="stat-col"><div class="stat-val">20h</div><div class="stat-lbl">مدة</div></div>
+            <div class="stat-col"><div class="stat-val">4.9</div><div class="stat-lbl">تقييم</div></div>
+            <div class="stat-col"><div class="stat-val">132</div><div class="stat-lbl">طالب</div></div>
+          </div>
+          <div style="padding:20px;">
+            <div style="font-family:Cairo;font-size:16px;font-weight:700;margin-bottom:10px;">وصف الدورة</div>
+            <div style="color:var(--txt-2);font-size:14px;line-height:1.8;">تعلّم Flutter من الصفر حتى الاحتراف، من بناء واجهات المستخدم المتقدمة إلى التكامل مع APIs وإدارة الحالة باستخدام BLoC.</div>
+          </div>
+          <!-- Progress -->
+          <div style="padding:0 20px; margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+              <span style="font-size:14px;font-weight:600;">تقدمك</span>
+              <span style="color:var(--primary-light);font-size:14px;font-weight:700;">65%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:65%;"></div></div>
+          </div>
+          <div style="font-family:Cairo;font-size:16px;font-weight:700;padding:0 20px;margin-bottom:14px;">محتوى الدورة</div>
+          <div class="lesson-row">
+            <div class="lesson-num">1</div>
+            <div class="l-info"><div class="l-title">مقدمة في Flutter</div><div class="l-dur">⏱ 45 دقيقة</div></div>
+            <i data-lucide="check-circle" style="width:20px;height:20px;color:var(--success);"></i>
+          </div>
+          <div class="lesson-row">
+            <div class="lesson-num">2</div>
+            <div class="l-info"><div class="l-title">Widgets و Layouts</div><div class="l-dur">⏱ 60 دقيقة</div></div>
+            <i data-lucide="check-circle" style="width:20px;height:20px;color:var(--success);"></i>
+          </div>
+          <div class="lesson-row" style="background:rgba(0,109,119,.06);border-radius:12px;margin:0 12px;">
+            <div class="lesson-num current">3</div>
+            <div class="l-info"><div class="l-title">State Management - BLoC</div><div class="l-dur">⏱ 90 دقيقة · جارية الآن</div></div>
+            <div class="glass-btn" style="width:32px;height:32px;background:rgba(255,183,3,.1);border-color:rgba(255,183,3,.2);">
+              <i data-lucide="play" style="width:16px;height:16px;color:var(--gold);"></i>
+            </div>
+          </div>
+          <div class="lesson-row">
+            <div class="lesson-num locked">4</div>
+            <div class="l-info"><div class="l-title">API Integration</div><div class="l-dur">⏱ 75 دقيقة</div></div>
+            <i data-lucide="lock" style="width:18px;height:18px;color:var(--txt-m);"></i>
+          </div>
+          <div style="padding:20px;">
+            <button class="btn-primary" onclick="go('quiz')">
+              <i data-lucide="file-text"></i>
+              اختبر معلوماتك
+            </button>
+            <button class="btn-outline" onclick="go('live')" style="margin-top:12px;">
+              <i data-lucide="video"></i>
+              البث المباشر
+            </button>
+            <button class="btn-outline" onclick="go('assignments')" style="margin-top:8px;">
+              <i data-lucide="clipboard-list"></i>
+              الواجبات
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ SEARCH ══════════════ -->
+      <div class="screen" id="s-search">
+        <div class="section-header-curved">
+          <div style="font-family:Cairo;font-size:24px;font-weight:800;margin-bottom:14px;">بحث</div>
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:12px 16px;">
+            <i data-lucide="search" style="width:18px;height:18px;color:rgba(255,255,255,.7);flex-shrink:0;"></i>
+            <span style="color:rgba(255,255,255,.6);font-size:15px;">ابحث عن دورة، مدرّس، أو موضوع...</span>
+          </div>
+        </div>
+        <div class="scroller">
+          <div style="padding:16px 20px 8px;color:var(--txt-m);font-size:13px;">أحدث الدورات</div>
+          <div class="teacher-card" onclick="go('detail')" style="cursor:pointer;">
+            <div style="width:50px;height:50px;border-radius:12px;background:linear-gradient(135deg,#111827,#1e293b);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="book-open" style="width:24px;height:24px;color:rgba(255,255,255,.15);"></i></div>
+            <div class="t-info"><div class="t-name">دورة Flutter المتقدمة</div><div class="t-sub">محمد محمود · 25 درس</div></div>
+            <i data-lucide="chevron-left" style="width:16px;height:16px;color:var(--txt-m);"></i>
+          </div>
+          <div class="teacher-card" onclick="go('detail')" style="cursor:pointer;">
+            <div style="width:50px;height:50px;border-radius:12px;background:linear-gradient(135deg,#0d1117,#1a1a2e);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="code-2" style="width:24px;height:24px;color:rgba(255,255,255,.15);"></i></div>
+            <div class="t-info"><div class="t-name">أساسيات Dart</div><div class="t-sub">أحمد السيد · 18 درس</div></div>
+            <i data-lucide="chevron-left" style="width:16px;height:16px;color:var(--txt-m);"></i>
+          </div>
+          <div class="teacher-card" onclick="go('books')" style="cursor:pointer;">
+            <div style="width:50px;height:50px;border-radius:12px;background:linear-gradient(135deg,var(--primary-dark),var(--elevated));display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="book" style="width:24px;height:24px;color:var(--gold);"></i></div>
+            <div class="t-info"><div class="t-name">Flutter Complete Guide</div><div class="t-sub">كتاب · مجاني</div></div>
+            <i data-lucide="chevron-left" style="width:16px;height:16px;color:var(--txt-m);"></i>
+          </div>
+          <div style="padding:16px 20px 8px;font-family:Cairo;font-size:16px;font-weight:700;">عمليات البحث الأخيرة</div>
+          <div style="padding:0 20px;display:flex;flex-wrap:wrap;gap:8px;">
+            <div class="chip chip-green">Dart</div>
+            <div class="chip chip-green">UI Design</div>
+            <div class="chip chip-green">BLoC</div>
+            <div class="chip chip-green">Firebase</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ QUIZ ══════════════ -->
+      <div class="screen" id="s-quiz">
+        <div class="section-header-curved">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="glass-btn" onclick="go('detail')"><i data-lucide="x"></i></div>
+            <div style="font-family:Cairo;font-weight:700;">السؤال 2 من 10</div>
+            <div class="chip chip-gold">⏱ 08:32</div>
+          </div>
+          <div class="quiz-progress-wrap">
+            <div class="progress-bar" style="flex:1;"><div class="progress-fill" style="width:20%;"></div></div>
+            <div class="quiz-pct">20%</div>
+          </div>
+        </div>
+        <div class="scroller">
+          <div class="question-card">
+            <div class="q-num">السؤال 2 / 10</div>
+            <div class="q-text">ما هو الـ Widget المستخدم لعرض قائمة طويلة بكفاءة في Flutter؟</div>
+            <div class="option">
+              <div class="opt-letter">أ</div>
+              <span>Column Widget</span>
+            </div>
+            <div class="option sel">
+              <div class="opt-letter">ب</div>
+              <span>ListView.builder</span>
+            </div>
+            <div class="option ok">
+              <div class="opt-letter">ج</div>
+              <span>ListView.builder ✓</span>
+            </div>
+            <div class="option">
+              <div class="opt-letter">د</div>
+              <span>Container Widget</span>
+            </div>
+          </div>
+          <div style="padding:0 20px 20px;">
+            <button class="btn-primary" onclick="go('success')">
+              <i data-lucide="arrow-left"></i>
+              السؤال التالي
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ INBOX ══════════════ -->
+      <div class="screen" id="s-inbox">
+        <div class="section-header-curved">
+          <div style="font-family:Cairo;font-size:24px;font-weight:800;">الرسائل</div>
+          <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:4px;">3 رسائل غير مقروءة</div>
+        </div>
+        <div class="scroller">
+          <div class="inbox-item">
+            <div class="av" style="width:48px;height:48px;background:rgba(0,109,119,.1);border:2px solid var(--gold);color:var(--gold);font-size:16px;">مح</div>
+            <div class="inbox-meta">
+              <div class="inbox-name">محمد محمود</div>
+              <div class="inbox-preview">أهلاً، يمكنك مراجعة الواجب الجديد في...</div>
+              <div class="inbox-time">منذ 5 دقائق</div>
+            </div>
+            <div class="unread-badge">3</div>
+          </div>
+          <div class="inbox-item">
+            <div class="av" style="width:48px;height:48px;background:rgba(230,57,70,.1);border:2px solid var(--error);color:var(--error);font-size:16px;">إد</div>
+            <div class="inbox-meta">
+              <div class="inbox-name">إدارة الأكاديمية</div>
+              <div class="inbox-preview">تم إضافة شهادتك الجديدة، يمكنك تحميلها...</div>
+              <div class="inbox-time">منذ ساعة</div>
+            </div>
+            <div class="unread-badge">1</div>
+          </div>
+          <div class="inbox-item">
+            <div class="av" style="width:48px;height:48px;background:rgba(0,109,119,.1);border:2px solid var(--gold);color:var(--gold);font-size:16px;">أح</div>
+            <div class="inbox-meta">
+              <div class="inbox-name">أحمد السيد</div>
+              <div class="inbox-preview">شكراً على مشاركتك في الجلسة المباشرة</div>
+              <div class="inbox-time">أمس</div>
+            </div>
+          </div>
+          <div class="inbox-item">
+            <div class="av" style="width:48px;height:48px;background:rgba(0,109,119,.1);border:2px solid var(--gold);color:var(--gold);font-size:16px;">سا</div>
+            <div class="inbox-meta">
+              <div class="inbox-name">سارة حسن</div>
+              <div class="inbox-preview">هل أتممت مشاهدة الدرس الثالث؟</div>
+              <div class="inbox-time">منذ يومين</div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item" onclick="go('home')"><div class="nav-icon-wrap"><i data-lucide="home"></i></div><div class="nav-label">الرئيسية</div></div>
+          <div class="nav-item" onclick="go('mycourses')"><div class="nav-icon-wrap"><i data-lucide="book-open"></i></div><div class="nav-label">تعلمي</div></div>
+          <div class="nav-item" onclick="go('notifications')"><div class="nav-icon-wrap"><i data-lucide="bell"></i></div><div class="nav-label">الإشعارات</div></div>
+          <div class="nav-item" onclick="go('profile')"><div class="nav-icon-wrap"><i data-lucide="settings"></i></div><div class="nav-label">الإعدادات</div></div>
+        </div>
+      </div>
+
+      <!-- ══════════════ NOTIFICATIONS ══════════════ -->
+      <div class="screen" id="s-notifications">
+        <div class="section-header-curved">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-family:Cairo;font-size:24px;font-weight:800;">الإشعارات</div>
+              <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:4px;">2 إشعار جديد</div>
+            </div>
+            <div class="glass-btn" onclick="go('home')"><i data-lucide="arrow-right"></i></div>
+          </div>
+        </div>
+        <div class="scroller">
+          <div class="notif-item unread">
+            <div class="notif-icon" style="background:rgba(0,109,119,.15);"><i data-lucide="book-open" style="color:var(--primary-light);"></i></div>
+            <div class="notif-body">
+              <div class="notif-title">درس جديد متاح</div>
+              <div class="notif-txt">تم إضافة الدرس 3 في دورة Flutter المتقدمة</div>
+              <div class="notif-time">منذ 10 دقائق</div>
+            </div>
+          </div>
+          <div class="notif-item unread">
+            <div class="notif-icon" style="background:rgba(255,183,3,.1);"><i data-lucide="award" style="color:var(--gold);"></i></div>
+            <div class="notif-body">
+              <div class="notif-title">تهانينا! 🎉</div>
+              <div class="notif-txt">أتممت دورة أساسيات Dart بنجاح وحصلت على شهادتك</div>
+              <div class="notif-time">منذ ساعتين</div>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon" style="background:rgba(230,57,70,.1);"><i data-lucide="video" style="color:var(--error);"></i></div>
+            <div class="notif-body">
+              <div class="notif-title">بث مباشر قريباً</div>
+              <div class="notif-txt">جلسة مباشرة مع محمد محمود غداً الساعة 9 مساءً</div>
+              <div class="notif-time">أمس</div>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon" style="background:rgba(45,198,83,.1);"><i data-lucide="check-circle" style="color:var(--success);"></i></div>
+            <div class="notif-body">
+              <div class="notif-title">تم قبول تسجيلك</div>
+              <div class="notif-txt">تم قبول طلب التسجيل في دورة تصميم واجهات UI</div>
+              <div class="notif-time">قبل 3 أيام</div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item" onclick="go('home')"><div class="nav-icon-wrap"><i data-lucide="home"></i></div><div class="nav-label">الرئيسية</div></div>
+          <div class="nav-item" onclick="go('mycourses')"><div class="nav-icon-wrap"><i data-lucide="book-open"></i></div><div class="nav-label">تعلمي</div></div>
+          <div class="nav-item active" onclick="go('notifications')"><div class="nav-icon-wrap"><i data-lucide="bell"></i></div><div class="nav-label">الإشعارات</div></div>
+          <div class="nav-item" onclick="go('profile')"><div class="nav-icon-wrap"><i data-lucide="settings"></i></div><div class="nav-label">الإعدادات</div></div>
+        </div>
+      </div>
+
+      <!-- ══════════════ DOWNLOADS ══════════════ -->
+      <div class="screen" id="s-downloads">
+        <div class="section-header-curved">
+          <div style="font-family:Cairo;font-size:24px;font-weight:800;">التنزيلات</div>
+          <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:4px;">المحتوى المحفوظ للمشاهدة بدون إنترنت</div>
+        </div>
+        <div class="scroller">
+          <div style="height:16px;"></div>
+          <div class="dl-item">
+            <div class="dl-icon"><i data-lucide="play-circle"></i></div>
+            <div class="dl-info"><div class="dl-title">مقدمة في Flutter - درس 1</div><div class="dl-sub">45 دقيقة · 180 MB</div></div>
+            <i data-lucide="play" style="width:20px;height:20px;color:var(--txt-m);"></i>
+          </div>
+          <div class="dl-item">
+            <div class="dl-icon"><i data-lucide="play-circle"></i></div>
+            <div class="dl-info"><div class="dl-title">Widgets و Layouts - درس 2</div><div class="dl-sub">60 دقيقة · 230 MB</div></div>
+            <i data-lucide="play" style="width:20px;height:20px;color:var(--txt-m);"></i>
+          </div>
+          <div class="dl-item">
+            <div class="dl-icon"><i data-lucide="file-text"></i></div>
+            <div class="dl-info"><div class="dl-title">ملخص الدورة PDF</div><div class="dl-sub">24 صفحة · 2.3 MB</div></div>
+            <i data-lucide="download" style="width:20px;height:20px;color:var(--txt-m);"></i>
+          </div>
+          <div style="padding:16px 20px;">
+            <div style="background:rgba(255,183,3,.08);border:1px solid rgba(255,183,3,.15);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
+              <i data-lucide="hard-drive" style="width:24px;height:24px;color:var(--gold);flex-shrink:0;"></i>
+              <div>
+                <div style="font-size:14px;font-weight:600;margin-bottom:6px;">المساحة المستخدمة</div>
+                <div class="progress-bar" style="width:160px;"><div class="progress-fill gold" style="width:40%;"></div></div>
+                <div style="font-size:12px;color:var(--txt-m);margin-top:4px;">412 MB من أصل 1 GB</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ BOOKS ══════════════ -->
+      <div class="screen" id="s-books">
+        <div class="section-header-curved">
+          <div style="font-family:Cairo;font-size:24px;font-weight:800;">المكتبة</div>
+          <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:4px;">الكتب والمراجع التعليمية</div>
+        </div>
+        <div class="scroller">
+          <div style="height:16px;"></div>
+          <div class="book-card">
+            <div class="book-thumb"><i data-lucide="book-open"></i></div>
+            <div class="book-info">
+              <div class="book-title">Flutter Complete Guide</div>
+              <div class="book-author">محمد محمود</div>
+              <div class="book-free">مجاني ✓</div>
+            </div>
+            <div class="glass-btn" style="width:40px;height:40px;" onclick="go('downloads')"><i data-lucide="download" style="width:18px;height:18px;"></i></div>
+          </div>
+          <div class="book-card">
+            <div class="book-thumb"><i data-lucide="book"></i></div>
+            <div class="book-info">
+              <div class="book-title">Dart Programming Language</div>
+              <div class="book-author">أحمد السيد</div>
+              <div class="book-price">49 ج.م</div>
+            </div>
+            <div class="glass-btn" style="width:40px;height:40px;" onclick="go('payment')"><i data-lucide="shopping-cart" style="width:18px;height:18px;"></i></div>
+          </div>
+          <div class="book-card">
+            <div class="book-thumb"><i data-lucide="layers"></i></div>
+            <div class="book-info">
+              <div class="book-title">Clean Architecture</div>
+              <div class="book-author">سارة حسن</div>
+              <div class="book-price">79 ج.م</div>
+            </div>
+            <div class="glass-btn" style="width:40px;height:40px;" onclick="go('payment')"><i data-lucide="shopping-cart" style="width:18px;height:18px;"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ CERTIFICATES ══════════════ -->
+      <div class="screen" id="s-certificates">
+        <div class="section-header-curved">
+          <div style="font-family:Cairo;font-size:24px;font-weight:800;">شهاداتي</div>
+          <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:4px;">إنجازاتك الأكاديمية</div>
+        </div>
+        <div class="scroller">
+          <div class="cert-card">
+            <div class="cert-seal"><i data-lucide="award"></i></div>
+            <div class="cert-title">شهادة إتمام دورة Dart</div>
+            <div class="cert-course">أساسيات Dart · 100% مكتملة</div>
+            <div class="cert-date"><i data-lucide="calendar"></i> 15 يونيو 2025</div>
+            <div class="cert-dl"><i data-lucide="download"></i> تحميل الشهادة</div>
+          </div>
+          <div class="cert-card" style="margin-top:14px;">
+            <div class="cert-seal"><i data-lucide="shield-check"></i></div>
+            <div class="cert-title">شهادة Flutter أساسيات</div>
+            <div class="cert-course">Flutter للمبتدئين · 100% مكتملة</div>
+            <div class="cert-date"><i data-lucide="calendar"></i> 2 مارس 2025</div>
+            <div class="cert-dl"><i data-lucide="download"></i> تحميل الشهادة</div>
+          </div>
+          <div style="height:20px;"></div>
+        </div>
+      </div>
+
+      <!-- ══════════════ LIVE SESSIONS ══════════════ -->
+      <div class="screen" id="s-live">
+        <div style="height:160px;background:linear-gradient(135deg,#0f172a,#1e293b);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
+          <div class="live-badge" style="margin-bottom:14px;"><div class="live-pulse"></div>بث مباشر</div>
+          <div style="font-family:Cairo;font-size:20px;font-weight:800;">جلسة أسئلة وأجوبة - Flutter</div>
+          <div style="color:var(--txt-m);font-size:14px;margin-top:4px;">👨‍🏫 محمد محمود</div>
+        </div>
+        <div class="scroller">
+          <div class="live-card">
+            <div style="font-family:Cairo;font-size:16px;font-weight:700;margin-bottom:14px;">الجلسة القادمة</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="display:flex;align-items:center;gap:8px;color:var(--txt-2);font-size:14px;"><i data-lucide="calendar" style="width:18px;height:18px;color:var(--primary-light);"></i>غداً - الخميس</div>
+              <div style="display:flex;align-items:center;gap:8px;color:var(--txt-2);font-size:14px;"><i data-lucide="clock" style="width:18px;height:18px;color:var(--primary-light);"></i>9:00 مساءً</div>
+            </div>
+            <button class="join-btn" onclick="go('success')">
+              <i data-lucide="video"></i>
+              انضم الآن
+            </button>
+          </div>
+          <div class="live-card" style="margin-top:14px;">
+            <div style="font-family:Cairo;font-size:15px;font-weight:700;margin-bottom:14px;">الجلسات المسجّلة</div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+              <div class="dl-icon"><i data-lucide="video"></i></div>
+              <div style="flex:1;"><div style="font-size:14px;font-weight:600;">مراجعة BLoC Pattern</div><div style="font-size:12px;color:var(--txt-m);">2 يوليو 2025 · 1:30 ساعة</div></div>
+              <div class="chip chip-green">مسجّلة</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;">
+              <div class="dl-icon"><i data-lucide="video"></i></div>
+              <div style="flex:1;"><div style="font-size:14px;font-weight:600;">تصحيح الواجب الأول</div><div style="font-size:12px;color:var(--txt-m);">28 يونيو 2025 · 2 ساعة</div></div>
+              <div class="chip chip-green">مسجّلة</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ ASSIGNMENTS ══════════════ -->
+      <div class="screen" id="s-assignments">
+        <div class="section-header-curved">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-family:Cairo;font-size:22px;font-weight:800;">الواجبات والتكليفات</div>
+              <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:4px;">دورة Flutter المتقدمة</div>
+            </div>
+            <div class="glass-btn" onclick="go('detail')"><i data-lucide="arrow-right"></i></div>
+          </div>
+        </div>
+        <div class="scroller">
+          <div style="height:16px;"></div>
+          <div class="assign-card">
+            <div class="assign-title">واجب تطبيق BLoC Pattern</div>
+            <div class="assign-meta" style="margin-bottom:10px;"><i data-lucide="calendar"></i>الموعد النهائي: 10 يوليو 2025</div>
+            <div class="chip chip-gold">جاري المراجعة</div>
+          </div>
+          <div class="assign-card">
+            <div class="assign-title">مشروع تصميم واجهة أمامية</div>
+            <div class="assign-meta" style="margin-bottom:10px;"><i data-lucide="calendar"></i>الموعد النهائي: 20 يوليو 2025</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="chip chip-red">لم يسلَّم</div>
+              <button class="btn-primary" style="width:auto;padding:8px 16px;font-size:13px;" onclick="go('success')">
+                <i data-lucide="upload"></i>
+                تسليم الآن
+              </button>
+            </div>
+          </div>
+          <div class="assign-card">
+            <div class="assign-title">اختبار متوسط المدة</div>
+            <div class="assign-meta" style="margin-bottom:10px;"><i data-lucide="check-circle" style="color:var(--success);"></i>تم التقييم</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="chip chip-green">تم التقييم</div>
+              <div style="font-family:Cairo;font-size:18px;font-weight:800;color:var(--gold);">85/100</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ PROFILE / SETTINGS ══════════════ -->
+      <div class="screen" id="s-profile">
+        <div class="profile-header">
+          <div class="av profile-av" style="width:80px;height:80px;background:var(--primary-dark);border:2.5px solid var(--gold);box-shadow:0 4px 12px rgba(255,183,3,.3);font-size:28px;color:var(--gold);">ط</div>
+          <div class="p-name">طالب العلم</div>
+          <div class="p-email">student@vantage.com</div>
+          <div class="chip chip-green">طالب مميز ⭐</div>
+          <div class="p-stats">
+            <div class="ps-item"><div class="ps-val">3</div><div class="ps-lbl">دورات</div></div>
+            <div class="ps-item"><div class="ps-val">2</div><div class="ps-lbl">شهادات</div></div>
+            <div class="ps-item"><div class="ps-val">85%</div><div class="ps-lbl">إتمام</div></div>
+          </div>
+        </div>
+        <div class="scroller">
+          <div style="height:12px;"></div>
+          <div class="settings-item">
+            <div class="si-icon" style="background:rgba(0,109,119,.15);"><i data-lucide="user" style="color:var(--primary-light);"></i></div>
+            <div class="si-label">تعديل الملف الشخصي</div>
+            <div class="si-arr"><i data-lucide="chevron-left"></i></div>
+          </div>
+          <div class="settings-item">
+            <div class="si-icon" style="background:rgba(255,183,3,.1);"><i data-lucide="moon" style="color:var(--gold);"></i></div>
+            <div class="si-label">الوضع الداكن</div>
+            <div class="toggle"></div>
+          </div>
+          <div class="settings-item">
+            <div class="si-icon" style="background:rgba(45,198,83,.12);"><i data-lucide="globe" style="color:var(--success);"></i></div>
+            <div class="si-label">اللغة</div>
+            <div style="color:var(--txt-m);font-size:14px;">العربية</div>
+          </div>
+          <div class="settings-item">
+            <div class="si-icon" style="background:rgba(59,130,246,.12);"><i data-lucide="bell" style="color:var(--info);"></i></div>
+            <div class="si-label">الإشعارات</div>
+            <div class="toggle"></div>
+          </div>
+          <div class="settings-item" onclick="go('certificates')">
+            <div class="si-icon" style="background:rgba(255,183,3,.1);"><i data-lucide="award" style="color:var(--gold);"></i></div>
+            <div class="si-label">شهاداتي</div>
+            <div class="si-arr"><i data-lucide="chevron-left"></i></div>
+          </div>
+          <div class="settings-item" onclick="go('inbox')">
+            <div class="si-icon" style="background:rgba(0,109,119,.15);"><i data-lucide="message-square" style="color:var(--primary-light);"></i></div>
+            <div class="si-label">الرسائل</div>
+            <div class="si-arr"><i data-lucide="chevron-left"></i></div>
+          </div>
+          <div class="settings-item" onclick="go('role')">
+            <div class="si-icon" style="background:rgba(230,57,70,.12);"><i data-lucide="log-out" style="color:var(--error);"></i></div>
+            <div class="si-label" style="color:var(--error);">تسجيل الخروج</div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item" onclick="go('home')"><div class="nav-icon-wrap"><i data-lucide="home"></i></div><div class="nav-label">الرئيسية</div></div>
+          <div class="nav-item" onclick="go('mycourses')"><div class="nav-icon-wrap"><i data-lucide="book-open"></i></div><div class="nav-label">تعلمي</div></div>
+          <div class="nav-item" onclick="go('notifications')"><div class="nav-icon-wrap"><i data-lucide="bell"></i></div><div class="nav-label">الإشعارات</div></div>
+          <div class="nav-item active" onclick="go('profile')"><div class="nav-icon-wrap"><i data-lucide="settings"></i></div><div class="nav-label">الإعدادات</div></div>
+        </div>
+      </div>
+
+      <!-- ══════════════ PAYMENT ══════════════ -->
+      <div class="screen" id="s-payment">
+        <div class="pay-header">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="glass-btn" onclick="go('detail')"><i data-lucide="arrow-right"></i></div>
+            <div style="font-family:Cairo;font-size:18px;font-weight:700;">إتمام الدفع</div>
+            <div style="width:40px;"></div>
+          </div>
+          <div class="pay-amount"><span class="pay-currency">ج.م</span><span>299</span></div>
+          <div class="pay-item-name">دورة Flutter المتقدمة - اشتراك كامل</div>
+        </div>
+        <div class="scroller">
+          <div style="padding:18px 20px 10px;font-family:Cairo;font-size:16px;font-weight:700;">طريقة الدفع</div>
+          <div class="pm-row">
+            <div class="pm-card sel"><i data-lucide="credit-card" style="color:var(--primary-light);"></i><div class="pm-lbl">بطاقة بنكية</div></div>
+            <div class="pm-card"><i data-lucide="smartphone" style="color:var(--gold);"></i><div class="pm-lbl">محفظة إلكترونية</div></div>
+            <div class="pm-card"><i data-lucide="building-2" style="color:var(--success);"></i><div class="pm-lbl">تحويل بنكي</div></div>
+          </div>
+          <!-- Card fields -->
+          <div style="margin:14px 20px 0;background:var(--surface);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:16px;">
+            <div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--txt-2);">بيانات البطاقة</div>
+            <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;margin-bottom:10px;">
+              <i data-lucide="credit-card" style="width:18px;height:18px;color:var(--txt-m);"></i>
+              <span style="color:var(--txt-m);font-size:14px;">•••• •••• •••• 4242</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;color:var(--txt-m);font-size:14px;">12/27</div>
+              <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;color:var(--txt-m);font-size:14px;">•••</div>
+            </div>
+          </div>
+          <!-- Order summary -->
+          <div class="order-card">
+            <div class="order-title">ملخص الطلب</div>
+            <div class="order-row"><span>سعر الدورة</span><span>350 ج.م</span></div>
+            <div class="order-row"><span style="color:var(--success);">خصم ترحيبي</span><span style="color:var(--success);">- 51 ج.م</span></div>
+            <div class="order-row order-total"><span>الإجمالي</span><span>299 ج.م</span></div>
+          </div>
+          <div style="padding:0 20px 20px;">
+            <button class="btn-primary" onclick="go('success')">
+              <i data-lucide="lock"></i>
+              ادفع الآن - 299 ج.م
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════ ADMIN DASHBOARD ══════════════ -->
+      <div class="screen" id="s-admin">
+        <div class="admin-header">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div style="font-family:Cairo;font-size:22px;font-weight:800;">لوحة التحكم</div>
+              <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:4px;">مرحباً، المدير 👋</div>
+            </div>
+            <div class="glass-btn"><i data-lucide="settings"></i></div>
+          </div>
+        </div>
+        <div class="scroller">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="sc-icon" style="background:rgba(0,109,119,.15);"><i data-lucide="users" style="color:var(--primary-light);"></i></div>
+              <div class="sc-val">248</div><div class="sc-lbl">إجمالي الطلاب</div>
+              <div class="sc-chg up"><i data-lucide="trending-up"></i>+12 هذا الشهر</div>
+            </div>
+            <div class="stat-card">
+              <div class="sc-icon" style="background:rgba(255,183,3,.12);"><i data-lucide="book-open" style="color:var(--gold);"></i></div>
+              <div class="sc-val">18</div><div class="sc-lbl">الدورات النشطة</div>
+              <div class="sc-chg up"><i data-lucide="trending-up"></i>+3 جديدة</div>
+            </div>
+            <div class="stat-card">
+              <div class="sc-icon" style="background:rgba(45,198,83,.12);"><i data-lucide="award" style="color:var(--success);"></i></div>
+              <div class="sc-val">95</div><div class="sc-lbl">شهادات صادرة</div>
+              <div class="sc-chg up"><i data-lucide="trending-up"></i>+8</div>
+            </div>
+            <div class="stat-card">
+              <div class="sc-icon" style="background:rgba(59,130,246,.12);"><i data-lucide="dollar-sign" style="color:var(--info);"></i></div>
+              <div class="sc-val">14k</div><div class="sc-lbl">الإيرادات</div>
+              <div class="sc-chg up"><i data-lucide="trending-up"></i>+22%</div>
+            </div>
+          </div>
+          <div style="padding:0 20px;font-family:Cairo;font-size:16px;font-weight:700;margin-bottom:14px;">آخر التسجيلات</div>
+          <div class="card" style="margin:0 20px 20px;">
+            <div class="teacher-card">
+              <div class="av" style="width:42px;height:42px;background:rgba(0,109,119,.1);border:2px solid var(--gold);color:var(--gold);font-size:14px;">أح</div>
+              <div class="t-info"><div class="t-name">أحمد سالم</div><div class="t-sub">Flutter المتقدمة</div></div>
+              <div class="chip chip-green">فعّال</div>
+            </div>
+            <div class="teacher-card">
+              <div class="av" style="width:42px;height:42px;background:rgba(255,183,3,.1);border:2px solid var(--gold);color:var(--gold);font-size:14px;">من</div>
+              <div class="t-info"><div class="t-name">منى خالد</div><div class="t-sub">Dart أساسيات</div></div>
+              <div class="chip chip-gold">قيد الانتظار</div>
+            </div>
+            <div class="teacher-card">
+              <div class="av" style="width:42px;height:42px;background:rgba(0,109,119,.1);border:2px solid var(--gold);color:var(--gold);font-size:14px;">عم</div>
+              <div class="t-info"><div class="t-name">عمر فاروق</div><div class="t-sub">تصميم UI</div></div>
+              <div class="chip chip-green">فعّال</div>
+            </div>
+          </div>
+        </div>
+        <div class="admin-nav">
+          <div class="nav-item active"><div class="nav-icon-wrap"><i data-lucide="activity"></i></div><div class="nav-label">لوحة التحكم</div></div>
+          <div class="nav-item"><div class="nav-icon-wrap"><i data-lucide="book-open"></i></div><div class="nav-label">المحتوى</div></div>
+          <div class="nav-item"><div class="nav-icon-wrap"><i data-lucide="users"></i></div><div class="nav-label">المستخدمون</div></div>
+          <div class="nav-item" onclick="go('profile')"><div class="nav-icon-wrap"><i data-lucide="settings"></i></div><div class="nav-label">الإعدادات</div></div>
+        </div>
+      </div>
+
+      <!-- ══════════════ SUPERVISOR ══════════════ -->
+      <div class="screen" id="s-supervisor">
+        <div class="section-header-curved">
+          <div style="font-family:Cairo;font-size:22px;font-weight:800;">لوحة المشرف</div>
+          <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:4px;">تابع تقدم طلابك</div>
+        </div>
+        <div class="scroller">
+          <div class="stats-grid">
+            <div class="stat-card"><div style="font-family:Cairo;font-size:28px;font-weight:800;color:var(--gold);">12</div><div style="color:var(--txt-m);font-size:13px;margin-top:4px;">طلاب تحت إشرافي</div></div>
+            <div class="stat-card"><div style="font-family:Cairo;font-size:28px;font-weight:800;color:var(--success);">8</div><div style="color:var(--txt-m);font-size:13px;margin-top:4px;">طلاب نشطون اليوم</div></div>
+          </div>
+          <div style="padding:0 20px;font-family:Cairo;font-size:16px;font-weight:700;margin-bottom:14px;">طلابي</div>
+          <div class="sup-student-card">
+            <div class="av" style="width:46px;height:46px;background:rgba(0,109,119,.1);border:2px solid var(--gold);color:var(--gold);font-size:16px;">أح</div>
+            <div class="sup-info">
+              <div class="sup-name">أحمد علي</div>
+              <div class="sup-course">Flutter المتقدمة</div>
+              <div class="sup-prog"><div class="progress-bar" style="flex:1;"><div class="progress-fill" style="width:75%;"></div></div><div class="sup-pct">75%</div></div>
+            </div>
+          </div>
+          <div class="sup-student-card">
+            <div class="av" style="width:46px;height:46px;background:rgba(0,109,119,.1);border:2px solid var(--gold);color:var(--gold);font-size:16px;">من</div>
+            <div class="sup-info">
+              <div class="sup-name">منى حسام</div>
+              <div class="sup-course">أساسيات Dart</div>
+              <div class="sup-prog"><div class="progress-bar" style="flex:1;"><div class="progress-fill gold" style="width:100%;"></div></div><div class="sup-pct" style="color:var(--gold);">100%</div></div>
+            </div>
+          </div>
+          <div class="sup-student-card">
+            <div class="av" style="width:46px;height:46px;background:rgba(0,109,119,.1);border:2px solid var(--gold);color:var(--gold);font-size:16px;">عم</div>
+            <div class="sup-info">
+              <div class="sup-name">عمر محمود</div>
+              <div class="sup-course">تصميم واجهات UI</div>
+              <div class="sup-prog"><div class="progress-bar" style="flex:1;"><div class="progress-fill" style="width:30%;"></div></div><div class="sup-pct">30%</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="admin-nav">
+          <div class="nav-item active"><div class="nav-icon-wrap"><i data-lucide="users"></i></div><div class="nav-label">الطلاب</div></div>
+          <div class="nav-item" onclick="go('inbox')"><div class="nav-icon-wrap"><i data-lucide="message-square"></i></div><div class="nav-label">الرسائل</div></div>
+          <div class="nav-item" onclick="go('notifications')"><div class="nav-icon-wrap"><i data-lucide="bell"></i></div><div class="nav-label">الإشعارات</div></div>
+          <div class="nav-item" onclick="go('profile')"><div class="nav-icon-wrap"><i data-lucide="settings"></i></div><div class="nav-label">الإعدادات</div></div>
+        </div>
+      </div>
+
+      <!-- ══════════════ SUCCESS ══════════════ -->
+      <div class="screen" id="s-success">
+        <div class="success-screen">
+          <div class="success-icon"><i data-lucide="check"></i></div>
+          <div class="success-title">تم بنجاح! 🎉</div>
+          <div class="success-desc">لقد أكملت العملية بنجاح. يمكنك الآن الوصول إلى المحتوى كاملاً والبدء في رحلتك التعليمية.</div>
+          <button class="btn-primary" onclick="go('home')"><i data-lucide="home"></i>العودة للرئيسية</button>
+          <button class="btn-outline" onclick="go('detail')"><i data-lucide="play"></i>ابدأ الدورة الآن</button>
+        </div>
+      </div>
+
+    </div><!-- /screens -->
+  </div><!-- /phone -->
+
+  <script>
+    // ── Onboarding slides data ──
+    const slides = [
+      { icon:'book-open',    title:'تعلم العقيدة الصحيحة',          desc:'دروس منهجية مبسطة في العقيدة والفقه والسيرة النبوية' },
+      { icon:'award',        title:'اختبارات وشهادات',               desc:'اختبر معلوماتك واحصل على شهادات معتمدة بعد إتمام الدورات' },
+      { icon:'users',        title:'مجتمع طلابي متفاعل',             desc:'تواصل مع زملائك وشارك في النقاشات والأنشطة الجماعية' },
+    ];
+    let obIdx = 0;
+
+    function obNext() {
+      if (obIdx < slides.length - 1) {
+        obIdx++;
+        updateOb();
+      } else {
+        go('role');
+        obIdx = 0;
+        updateOb();
+      }
+    }
+
+    function updateOb() {
+      const s = slides[obIdx];
+      // update icon
+      const iconWrap = document.getElementById('ob-icon');
+      iconWrap.innerHTML = `<i data-lucide="${s.icon}"></i>`;
+      document.getElementById('ob-title').textContent = s.title;
+      document.getElementById('ob-desc').textContent  = s.desc;
+      document.getElementById('ob-btn-txt').textContent = (obIdx === slides.length - 1) ? 'ابدأ رحلتك' : 'التالي';
+      // dots
+      for (let i = 0; i < 3; i++) {
+        const d = document.getElementById(`d${i}`);
+        d.classList.toggle('active', i === obIdx);
+      }
+      lucide.createIcons();
+    }
+
+    // ── Screen navigation ──
+    function go(name) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(`s-${name}`);
+      if (target) target.classList.add('active');
+
+      // update tabs
+      document.querySelectorAll('.tab').forEach(t => {
+        t.classList.toggle('active', t.getAttribute('onclick') === `go('${name}')`);
+      });
+
+      // scroll screen to top
+      if (target) {
+        const sc = target.querySelector('.scroller');
+        if (sc) sc.scrollTop = 0;
+      }
+
+      lucide.createIcons();
+    }
+
+    // ── Init ──
+    lucide.createIcons();
+  </script>
+</body>
+</html>

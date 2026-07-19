@@ -9,8 +9,32 @@ export default function App() {
   const [projects, setProjects] = useState([]);
   const [demos,    setDemos]    = useState([]);
 
-  /* Cursor ambient glow */
+  /* Cursor ambient glow & Splash screen */
   useEffect(() => {
+    // Hide splash screen after delay to allow morph animation
+    const hideSplash = () => {
+      const splash = document.getElementById('splash');
+      const container = document.querySelector('.profile-container');
+      const text = document.querySelector('.name-text');
+      const bar = document.querySelector('.loading-bar');
+      const img = document.getElementById('splash-img');
+      
+      if (splash) {
+        if (container) container.classList.add('morphing');
+        if (text) text.style.opacity = '0';
+        if (bar) bar.style.opacity = '0';
+        if (img) img.style.display = 'block';
+        
+        setTimeout(() => {
+          splash.style.opacity = '0';
+          setTimeout(() => splash.remove(), 500);
+        }, 500);
+      }
+    };
+    
+    // Trigger after 1.5 seconds to show the animation
+    setTimeout(hideSplash, 1500);
+
     const glow = document.querySelector('.cursor-glow');
     if (!glow) return;
     const move = (e) => {
@@ -25,6 +49,11 @@ export default function App() {
   useEffect(() => {
     const unsubProfile = subscribeToProfile((data) => {
       setProfile({ ...defaultProfile, ...data });
+      // Update splash screen image dynamically if it exists
+      const splashImg = document.getElementById('splash-img');
+      if (splashImg && data.photo) {
+        splashImg.src = data.photo;
+      }
     });
 
     const unsubProjects = subscribeToProjects((data) => {

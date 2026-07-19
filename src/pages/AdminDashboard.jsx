@@ -216,8 +216,33 @@ export default function AdminDashboard({
             </div>
             <div className="ap-section">
               <p className="ap-section-label">Bio</p>
-              <textarea className="ap-input ap-textarea" rows={4} value={profile.bio}
+              <textarea className="ap-input ap-textarea" rows={4} value={profile.bio || ''}
                         onChange={(e) => onProfileChange({ ...profile, bio: e.target.value })} />
+            </div>
+            
+            {/* Contact Links */}
+            <div className="ap-section">
+              <p className="ap-section-label" style={{borderTop: '1px solid #334155', paddingTop: '1.5rem', marginTop: '1rem'}}>Contact & Social Links</p>
+            </div>
+            <div className="ap-section">
+              <p className="ap-section-label">LinkedIn URL</p>
+              <input className="ap-input" value={profile.linkedin || ''} placeholder="https://linkedin.com/in/..."
+                     onChange={(e) => onProfileChange({ ...profile, linkedin: e.target.value })} />
+            </div>
+            <div className="ap-section">
+              <p className="ap-section-label">WhatsApp Number</p>
+              <input className="ap-input" value={profile.whatsapp || ''} placeholder="+201..."
+                     onChange={(e) => onProfileChange({ ...profile, whatsapp: e.target.value })} />
+            </div>
+            <div className="ap-section">
+              <p className="ap-section-label">Phone Number</p>
+              <input className="ap-input" value={profile.phone || ''} placeholder="+201..."
+                     onChange={(e) => onProfileChange({ ...profile, phone: e.target.value })} />
+            </div>
+            <div className="ap-section">
+              <p className="ap-section-label">Facebook URL</p>
+              <input className="ap-input" value={profile.facebook || ''} placeholder="https://facebook.com/..."
+                     onChange={(e) => onProfileChange({ ...profile, facebook: e.target.value })} />
             </div>
 
             <p className="ap-hint" style={{ marginTop: '1rem' }}>Changes save automatically.</p>
@@ -343,10 +368,35 @@ export default function AdminDashboard({
                         <p className="ap-hint" style={{ marginBottom: '4px' }}>Title</p>
                         <input className="ap-input" value={demo.title} onChange={(e) => updateDemo({ title: e.target.value })} />
                       </div>
-                      <div>
-                        <p className="ap-hint" style={{ marginBottom: '4px' }}>Description</p>
-                        <textarea className="ap-input ap-textarea" value={demo.description} onChange={(e) => updateDemo({ description: e.target.value })} rows={3} />
-                      </div>
+                        <div>
+                          <p className="ap-hint" style={{ marginBottom: '4px' }}>Description</p>
+                          <textarea className="ap-input ap-textarea" value={demo.description} onChange={(e) => updateDemo({ description: e.target.value })} rows={3} />
+                        </div>
+                        <div>
+                          <p className="ap-hint" style={{ marginBottom: '4px' }}>Action Buttons (e.g., GitHub, Live Link)</p>
+                          {(demo.links || []).map((link, idx) => (
+                            <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                              <input className="ap-input" style={{flex: 1}} placeholder="Label (e.g. GitHub)" value={link.label} onChange={(e) => {
+                                const newLinks = [...(demo.links || [])];
+                                newLinks[idx].label = e.target.value;
+                                updateDemo({ links: newLinks });
+                              }} />
+                              <input className="ap-input" style={{flex: 2}} placeholder="URL (https://...)" value={link.url} onChange={(e) => {
+                                const newLinks = [...(demo.links || [])];
+                                newLinks[idx].url = e.target.value;
+                                updateDemo({ links: newLinks });
+                              }} />
+                              <button className="ap-remove-btn" style={{padding: '0 12px'}} onClick={() => {
+                                const newLinks = demo.links.filter((_, i) => i !== idx);
+                                updateDemo({ links: newLinks });
+                              }}>✕</button>
+                            </div>
+                          ))}
+                          <button className="ap-file-btn small" style={{marginTop: '4px', width: 'auto', display: 'inline-block'}} onClick={() => {
+                            const newLinks = [...(demo.links || []), { label: '', url: '' }];
+                            updateDemo({ links: newLinks });
+                          }}>+ Add Button</button>
+                        </div>
                       <div>
                         <p className="ap-hint" style={{ marginBottom: '4px' }}>Layout Alignment</p>
                         <select className="ap-select" value={demo.alignment} onChange={(e) => updateDemo({ alignment: e.target.value })}>

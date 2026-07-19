@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 
-export default function FeaturedApp({ title, description, alignment = 'left', htmlContent }) {
+export default function FeaturedApp({ title, description, alignment = 'left', htmlContent, links = [] }) {
   const iframeRef = useRef(null);
 
   // If we wanted to adjust the iframe size dynamically based on its content,
@@ -25,7 +25,25 @@ export default function FeaturedApp({ title, description, alignment = 'left', ht
           <p className="featured-desc">{description}</p>
           
           <div className="featured-actions">
-            <span className="featured-hint">Interact with the device →</span>
+            <span className="featured-hint">Interact with the device ✨</span>
+            
+            {links && links.length > 0 && (
+              <div className="custom-actions-grid">
+                {links.map((link, idx) => {
+                  if(!link.label || !link.url) return null;
+                  return (
+                    <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className="custom-action-btn">
+                      <span className="btn-glow"></span>
+                      <span className="btn-text">{link.label}</span>
+                      <svg className="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                      </svg>
+                    </a>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
 

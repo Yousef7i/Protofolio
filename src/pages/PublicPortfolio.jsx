@@ -3,6 +3,7 @@ import Navbar      from '../components/Navbar';
 import Hero        from '../components/Hero';
 import Gallery     from '../components/Gallery';
 import FeaturedApp from '../components/FeaturedApp';
+import Contact     from '../components/Contact';
 
 export default function PublicPortfolio({ profile, projects, demos }) {
   const workRef = useRef(null);
@@ -26,6 +27,7 @@ export default function PublicPortfolio({ profile, projects, demos }) {
           description={demo.description}
           alignment={demo.alignment}
           htmlContent={demo.htmlContent}
+          links={demo.links}
         />
       ))}
 
@@ -36,10 +38,12 @@ export default function PublicPortfolio({ profile, projects, demos }) {
         />
       </div>
 
+      <Contact profile={profile} />
+
       <footer className="footer">
         <span className="footer-logo">Port<em>folio</em></span>
         <span className="footer-copy">
-          {profile.name} · {new Date().getFullYear()}
+          {profile.name} © {new Date().getFullYear()}
         </span>
       </footer>
     </>

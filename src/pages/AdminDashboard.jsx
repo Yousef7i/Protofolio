@@ -231,9 +231,20 @@ export default function AdminDashboard({
                             const n = [...projects]; n[idx].modules.splice(mIdx, 1); onProjectsChange(n);
                           }}><Trash2 size={16} /></button>
                         </div>
-                        <textarea className="flutter-input" rows="2" placeholder="Module Description" value={mod.description} onChange={e => {
-                          const n = [...projects]; n[idx].modules[mIdx].description = e.target.value; onProjectsChange(n);
-                        }} />
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                          <textarea className="flutter-input" style={{flex: 1}} rows="2" placeholder="Module Description" value={mod.description} onChange={e => {
+                            const n = [...projects]; n[idx].modules[mIdx].description = e.target.value; onProjectsChange(n);
+                          }} />
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', width: '130px', justifyContent: 'center' }}>
+                            {mod.fileUrl && <a href={mod.fileUrl} target="_blank" rel="noreferrer" style={{color: '#0ea5e9', fontSize: '12px', textAlign: 'center'}}>View Uploaded File</a>}
+                            <label className="flutter-btn secondary small" style={{textAlign: 'center', fontSize: '12px', padding: '6px', cursor: 'pointer'}}>
+                              {isUploading ? 'Uploading...' : 'Upload HTML/PDF'}
+                              <input type="file" hidden accept=".html,.htm,.pdf" onChange={e => uploadFile(e.target.files[0], url => {
+                                const n = [...projects]; n[idx].modules[mIdx].fileUrl = url; onProjectsChange(n);
+                              })} />
+                            </label>
+                          </div>
+                        </div>
                       </div>
                     ))}
                     {!(proj.modules && proj.modules.length > 0) && <p style={{ color: '#64748b', fontSize: '12px' }}>No modules added yet.</p>}

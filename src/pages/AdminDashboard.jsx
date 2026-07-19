@@ -131,8 +131,16 @@ export default function AdminDashboard({
               </div>
               <h3 style={{ color: 'white', margin: '2rem 0 1rem', borderBottom: '1px solid #1e293b', paddingBottom: '0.5rem' }}>Social Links</h3>
               <div className="form-row">
-                <div className="form-group"><label>LinkedIn</label><input className="flutter-input" value={profile.linkedin} onChange={e => onProfileChange({...profile, linkedin: e.target.value})} /></div>
-                <div className="form-group"><label>WhatsApp</label><input className="flutter-input" value={profile.whatsapp} onChange={e => onProfileChange({...profile, whatsapp: e.target.value})} /></div>
+                <div className="form-group"><label>GitHub</label><input className="flutter-input" placeholder="https://github.com/username" value={profile.github || ''} onChange={e => onProfileChange({...profile, github: e.target.value})} /></div>
+                <div className="form-group"><label>LinkedIn</label><input className="flutter-input" placeholder="https://linkedin.com/in/username" value={profile.linkedin || ''} onChange={e => onProfileChange({...profile, linkedin: e.target.value})} /></div>
+              </div>
+              <div className="form-row">
+                <div className="form-group"><label>WhatsApp</label><input className="flutter-input" placeholder="+201019964918" value={profile.whatsapp || ''} onChange={e => onProfileChange({...profile, whatsapp: e.target.value})} /></div>
+                <div className="form-group"><label>Email</label><input className="flutter-input" placeholder="email@example.com" value={profile.email || ''} onChange={e => onProfileChange({...profile, email: e.target.value})} /></div>
+              </div>
+              <div className="form-row">
+                <div className="form-group"><label>Phone</label><input className="flutter-input" placeholder="+201019964918" value={profile.phone || ''} onChange={e => onProfileChange({...profile, phone: e.target.value})} /></div>
+                <div className="form-group"></div>
               </div>
             </div>
           )}

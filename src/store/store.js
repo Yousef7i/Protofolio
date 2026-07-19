@@ -8,8 +8,10 @@ export const defaultProfile = {
   location:   'Egypt',
   photo:      null,
   photoId:    null,
+  github:     '',
   linkedin:   '',
   whatsapp:   '',
+  email:      '',
   phone:      '',
   facebook:   '',
 };

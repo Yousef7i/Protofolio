@@ -1,124 +1,49 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import PublicPortfolio from './pages/PublicPortfolio';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AdminDashboard from './pages/AdminDashboard';
-import { saveProfile, saveProjects, saveDemos, defaultProfile, subscribeToProfile, subscribeToProjects, subscribeToDemos } from './store/store';
+import * as store from './store/store';
 
 export default function App() {
-  const [profile,  setProfile]  = useState(defaultProfile);
+  const [profile, setProfile] = useState(store.defaultProfile);
   const [projects, setProjects] = useState([]);
-  const [demos,    setDemos]    = useState([]);
+  const [services, setServices] = useState([]);
+  const [experience, setExperience] = useState([]);
+  const [certificates, setCertificates] = useState([]);
+  const [stats, setStats] = useState([]);
+  const [techStack, setTechStack] = useState([]);
+  const [expertise, setExpertise] = useState([]);
 
-  /* Cursor ambient glow & Splash screen */
   useEffect(() => {
-    // Hide splash screen after delay to allow morph animation
-    const hideSplash = () => {
-      const splash = document.getElementById('splash');
-      const container = document.querySelector('.profile-container');
-      const text = document.querySelector('.name-text');
-      const bar = document.querySelector('.loading-bar');
-      const img = document.getElementById('splash-img');
-      
-      if (splash) {
-        if (container) container.classList.add('morphing');
-        if (text) text.style.opacity = '0';
-        if (bar) bar.style.opacity = '0';
-        if (img) img.style.display = 'block';
-        
-        setTimeout(() => {
-          splash.style.opacity = '0';
-          setTimeout(() => splash.remove(), 500);
-        }, 500);
-      }
-    };
-    
-    // Trigger after 1.5 seconds to show the animation
-    setTimeout(hideSplash, 1500);
-
-    const glow = document.querySelector('.cursor-glow');
-    if (!glow) return;
-    const move = (e) => {
-      glow.style.left = `${e.clientX}px`;
-      glow.style.top  = `${e.clientY}px`;
-    };
-    window.addEventListener('mousemove', move, { passive: true });
-    return () => window.removeEventListener('mousemove', move);
+    const unsubs = [
+      store.subscribeToProfile(setProfile),
+      store.subscribeToProjects(setProjects),
+      store.subscribeToServices(setServices),
+      store.subscribeToExperience(setExperience),
+      store.subscribeToCertificates(setCertificates),
+      store.subscribeToStats(setStats),
+      store.subscribeToTechStack(setTechStack),
+      store.subscribeToExpertise(setExpertise),
+    ];
+    return () => unsubs.forEach(u => u());
   }, []);
-
-  /* Firebase Data Subscriptions */
-  useEffect(() => {
-    const unsubProfile = subscribeToProfile((data) => {
-      setProfile({ ...defaultProfile, ...data });
-      // Update splash screen image dynamically if it exists
-      const splashImg = document.getElementById('splash-img');
-      if (splashImg && data.photo) {
-        splashImg.src = data.photo;
-      }
-    });
-
-    const unsubProjects = subscribeToProjects((data) => {
-      setProjects(data);
-    });
-
-    const unsubDemos = subscribeToDemos((data) => {
-      setDemos(data);
-    });
-
-    return () => {
-      unsubProfile();
-      unsubProjects();
-      unsubDemos();
-    };
-  }, []);
-
-  /* Handlers for Admin Dashboard */
-  const handleProfileChange = (updated) => {
-    setProfile(updated);
-    saveProfile(updated);
-  };
-
-  const handleAddProject = (item) => {
-    const next = [item, ...projects];
-    setProjects(next);
-    saveProjects(next);
-  };
-
-  const handleDeleteProject = (item) => {
-    const next = projects.filter(p => p.public_id !== item.public_id);
-    setProjects(next);
-    saveProjects(next);
-  };
-
-  const handleDemosChange = (updatedDemos) => {
-    setDemos(updatedDemos);
-    saveDemos(updatedDemos);
-  };
-
-  // The UI will now render instantly using default profile data
-  // while Firebase loads the projects and updates in the background.
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/admin">
       <div className="cursor-glow" />
       <Routes>
-        <Route 
-          path="/" 
-          element={<PublicPortfolio profile={profile} projects={projects} demos={demos} />} 
-        />
-        <Route 
-          path="/admin" 
-          element={
-            <AdminDashboard 
-              profile={profile}
-              onProfileChange={handleProfileChange}
-              projects={projects}
-              onAddProject={handleAddProject}
-              onDeleteProject={handleDeleteProject}
-              demos={demos}
-              onDemosChange={handleDemosChange}
-            />
-          } 
-        />
+        <Route path="/" element={
+          <AdminDashboard 
+            profile={profile} onProfileChange={(d) => { setProfile(d); store.saveProfile(d); }}
+            projects={projects} onProjectsChange={(d) => { setProjects(d); store.saveProjects(d); }}
+            services={services} onServicesChange={(d) => { setServices(d); store.saveServices(d); }}
+            experience={experience} onExperienceChange={(d) => { setExperience(d); store.saveExperience(d); }}
+            certificates={certificates} onCertificatesChange={(d) => { setCertificates(d); store.saveCertificates(d); }}
+            stats={stats} onStatsChange={(d) => { setStats(d); store.saveStats(d); }}
+            techStack={techStack} onTechStackChange={(d) => { setTechStack(d); store.saveTechStack(d); }}
+            expertise={expertise} onExpertiseChange={(d) => { setExpertise(d); store.saveExpertise(d); }}
+          />
+        } />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );

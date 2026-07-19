@@ -1577,3 +1577,38 @@ body::after {
   font-size: 12px;
   font-weight: 500;
 }
+
+/* FLUTTER ADMIN STYLES */
+.flutter-admin-layout { display: flex; height: 100vh; background: #0b1120; color: #f8fafc; font-family: 'Poppins', sans-serif; }
+.flutter-sidebar { width: 260px; background: #0f172a; border-right: 1px solid #1e293b; display: flex; flex-direction: column; }
+.sidebar-header { padding: 2rem 1.5rem; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #1e293b; }
+.avatar-mini img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #0ea5e9; }
+.sidebar-nav { padding: 1.5rem 0; flex: 1; overflow-y: auto; }
+.nav-item { width: 100%; padding: 12px 24px; display: flex; align-items: center; gap: 12px; color: #94a3b8; background: transparent; border: none; cursor: pointer; text-align: left; font-size: 14px; transition: 0.2s; }
+.nav-item:hover { background: #1e293b; color: #fff; }
+.nav-item.active { background: linear-gradient(90deg, rgba(14,165,233,0.1) 0%, transparent 100%); color: #0ea5e9; border-left: 3px solid #0ea5e9; }
+.nav-item.logout { margin-top: auto; color: #ef4444; border-top: 1px solid #1e293b; }
+.flutter-main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.content-header { padding: 1.5rem 2rem; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.8); backdrop-filter: blur(10px); }
+.content-scroll { padding: 2rem; flex: 1; overflow-y: auto; }
+.flutter-card { background: #1e293b; border-radius: 12px; padding: 1.5rem; border: 1px solid #334155; margin-bottom: 1.5rem; }
+.item-card { margin-bottom: 1rem; }
+.item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.8rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.form-group { margin-bottom: 1.2rem; display: flex; flex-direction: column; gap: 8px; }
+.form-group label { color: #94a3b8; font-size: 13px; font-weight: 500; }
+.flutter-input { width: 100%; padding: 12px 16px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #fff; outline: none; transition: 0.3s; font-family: inherit; }
+.flutter-input:focus { border-color: #0ea5e9; box-shadow: 0 0 0 2px rgba(14,165,233,0.2); }
+.flutter-btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none; transition: 0.3s; text-decoration: none; }
+.flutter-btn.primary { background: linear-gradient(135deg, #0ea5e9, #3b82f6); color: white; }
+.flutter-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(14,165,233,0.4); }
+.flutter-btn.secondary { background: #334155; color: white; }
+.flutter-btn.secondary:hover { background: #475569; }
+.flutter-btn.small { padding: 6px 12px; font-size: 13px; }
+.icon-btn { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; transition: 0.2s; }
+.icon-btn.danger { background: rgba(239,68,68,0.1); color: #ef4444; }
+.icon-btn.danger:hover { background: #ef4444; color: white; }
+.flutter-login-container { height: 100vh; display: flex; align-items: center; justify-content: center; background: #0b1120; }
+.flutter-login-card { width: 100%; max-width: 400px; background: #1e293b; padding: 2.5rem; border-radius: 16px; border: 1px solid #334155; position: relative; overflow: hidden; }
+.glow-circle { position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: #0ea5e9; filter: blur(80px); opacity: 0.3; pointer-events: none; }
+.list-manager { display: flex; flex-direction: column; gap: 1rem; }

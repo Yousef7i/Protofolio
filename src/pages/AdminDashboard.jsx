@@ -1,418 +1,264 @@
 import { useState, useRef, useEffect } from 'react';
 import { uploadToCloudinary } from '../lib/cloudinary';
-import { CATEGORIES } from '../store/store';
 import { auth } from '../lib/firebase';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { Save, Plus, Trash2, Link as LinkIcon, LogOut, LayoutDashboard, Briefcase, FileText, Award, BarChart, Settings, User } from 'lucide-react';
 
-/* ══════════════════════════════════════════
-   Single upload row with progress
-══════════════════════════════════════════ */
-function UploadRow({ onDone }) {
-  const [progress, setProgress] = useState(null);
-  const [error,    setError]    = useState(null);
-  const [category, setCategory] = useState('flutter');
-  const [title,    setTitle]    = useState('');
-  const inputRef = useRef(null);
-
-  const handle = async (file) => {
-    if (!file) return;
-    setError(null); setProgress(0);
-    try {
-      const result = await uploadToCloudinary(file, setProgress);
-      onDone({
-        ...result,
-        pf_category: category,
-        pf_title: title || result.original_filename || 'Untitled',
-        pf_type: file.type.startsWith('video') ? 'video' : 'image',
-      });
-      setProgress(null); setTitle('');
-      if (inputRef.current) inputRef.current.value = '';
-    } catch (e) {
-      setError(e.message); setProgress(null);
-    }
-  };
-
-  return (
-    <div className="ap-upload-row">
-      <div className="ap-row-fields">
-        <input
-          className="ap-input"
-          placeholder="Title (optional)"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <select
-          className="ap-select"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          {CATEGORIES.map(c => (
-            <option key={c.id} value={c.id}>{c.label}</option>
-          ))}
-        </select>
-      </div>
-
-      <label className={`ap-file-btn${progress !== null ? ' ap-uploading' : ''}`}>
-        {progress !== null ? (
-          <span className="ap-progress-wrap">
-            <span className="ap-progress-bar" style={{ width: `${progress}%` }} />
-            <span className="ap-progress-label">{progress}%</span>
-          </span>
-        ) : (
-          <>
-            <span className="ap-plus">+</span> Choose File
-            <input
-              ref={inputRef}
-              type="file"
-              accept="image/*,video/*"
-              onChange={(e) => handle(e.target.files[0])}
-            />
-          </>
-        )}
-      </label>
-
-      {error && <p className="ap-error">{error}</p>}
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════
-   Admin Dashboard Page
-══════════════════════════════════════════ */
 export default function AdminDashboard({
   profile, onProfileChange,
-  projects, onAddProject, onDeleteProject,
-  demos, onDemosChange,
+  projects, onProjectsChange,
+  services, onServicesChange,
+  experience, onExperienceChange,
+  certificates, onCertificatesChange,
+  stats, onStatsChange,
+  techStack, onTechStackChange,
+  expertise, onExpertiseChange
 }) {
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
-
-  const [tab, setTab] = useState('profile');   // 'profile' | 'projects' | 'demos'
-  const [photoProgress, setPhotoProgress] = useState(null);
-  const [photoError,    setPhotoError]    = useState(null);
+  const [tab, setTab] = useState('profile');
+  
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
+    const unsub = onAuthStateChanged(auth, setUser);
+    return () => unsub();
   }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setAuthError('');
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (err) {
-      setAuthError('Invalid email or password.');
-    }
+    try { await signInWithEmailAndPassword(auth, email, password); } 
+    catch (err) { setAuthError('Invalid credentials'); }
   };
 
-  const handleLogout = async () => {
-    await signOut(auth);
-  };
-
-  /* Upload profile photo */
-  const handlePhotoUpload = async (file) => {
+  const uploadFile = async (file, callback) => {
     if (!file) return;
-    setPhotoError(null); setPhotoProgress(0);
+    setIsUploading(true);
     try {
-      const res = await uploadToCloudinary(file, setPhotoProgress);
-      onProfileChange({ ...profile, photo: res.secure_url, photoId: res.public_id });
-      setPhotoProgress(null);
+      const res = await uploadToCloudinary(file, () => {});
+      callback(res.secure_url);
     } catch (e) {
-      setPhotoError(e.message); setPhotoProgress(null);
+      alert("Upload failed: " + e.message);
     }
+    setIsUploading(false);
   };
+
+  if (!user) {
+    return (
+      <div className="flutter-login-container">
+        <div className="flutter-login-card">
+          <div className="glow-circle" />
+          <h2 style={{ color: 'white', textAlign: 'center', marginBottom: '2rem', fontSize: '24px', fontWeight: 'bold' }}>Admin Access</h2>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <input type="email" placeholder="Email Address" className="flutter-input" value={email} onChange={e => setEmail(e.target.value)} required />
+            <input type="password" placeholder="Password" className="flutter-input" value={password} onChange={e => setPassword(e.target.value)} required />
+            <button type="submit" className="flutter-btn primary" style={{ marginTop: '1rem' }}>Secure Login</button>
+            {authError && <p style={{ color: '#ef4444', textAlign: 'center', marginTop: '10px' }}>{authError}</p>}
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  const tabs = [
+    { id: 'profile', icon: User, label: 'Profile' },
+    { id: 'projects', icon: LayoutDashboard, label: 'Modules (Projects)' },
+    { id: 'services', icon: Briefcase, label: 'Services' },
+    { id: 'experience', icon: FileText, label: 'Experience' },
+    { id: 'certificates', icon: Award, label: 'Certificates' },
+    { id: 'tech', icon: Settings, label: 'Tech Stack' },
+    { id: 'stats', icon: BarChart, label: 'Stats' },
+  ];
 
   return (
-    <div className="admin-dashboard">
-      <div className="ad-container">
-        <div className="ap-header">
-          <h2 className="ap-title">Dashboard</h2>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <a href="/" className="btn-ghost" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>← Back to Site</a>
-            {user && <button className="ap-close" onClick={handleLogout} style={{ fontSize: '14px', background: 'var(--c-elevated)', padding: '4px 10px', borderRadius: '4px' }}>Logout</button>}
+    <div className="flutter-admin-layout">
+      {/* Sidebar */}
+      <div className="flutter-sidebar">
+        <div className="sidebar-header">
+          <div className="avatar-mini">
+            <img src={profile.photo || 'https://via.placeholder.com/150'} alt="Admin" />
+          </div>
+          <div>
+            <h3 style={{ color: 'white', fontSize: '14px', fontWeight: 'bold' }}>Admin Panel</h3>
+            <p style={{ color: '#94a3b8', fontSize: '12px' }}>Portfolio Manager</p>
           </div>
         </div>
-
-        {!user ? (
-          <div className="ap-body" style={{ justifyContent: 'center' }}>
-            <div className="ap-section">
-              <p className="ap-section-label" style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--gold-300)' }}>Secure Admin Login</p>
-              <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <input type="email" placeholder="Email" className="ap-input" value={email} onChange={e => setEmail(e.target.value)} required />
-                <input type="password" placeholder="Password" className="ap-input" value={password} onChange={e => setPassword(e.target.value)} required />
-                <button type="submit" className="ap-file-btn" style={{ justifyContent: 'center', marginTop: '0.5rem' }}>Login to Dashboard</button>
-                {authError && <p className="ap-error" style={{ textAlign: 'center' }}>{authError}</p>}
-              </form>
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Tabs */}
-            <div className="ap-tabs">
-          <button className={`ap-tab${tab === 'profile'  ? ' active' : ''}`} onClick={() => setTab('profile')}>Profile</button>
-          <button className={`ap-tab${tab === 'projects' ? ' active' : ''}`} onClick={() => setTab('projects')}>Portfolio ({projects.length})</button>
-          <button className={`ap-tab${tab === 'demos'    ? ' active' : ''}`} onClick={() => setTab('demos')}>Modules</button>
+        <div className="sidebar-nav">
+          {tabs.map(t => (
+            <button key={t.id} className={`nav-item ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}>
+              <t.icon size={18} /> {t.label}
+            </button>
+          ))}
         </div>
+        <button className="nav-item logout" onClick={() => signOut(auth)}>
+          <LogOut size={18} /> Logout
+        </button>
+      </div>
 
-        {/* ── PROFILE TAB ── */}
-        {tab === 'profile' && (
-          <div className="ap-body">
-            {/* Photo upload */}
-            <div className="ap-section">
-              <p className="ap-section-label">Profile Photo</p>
-              <div className="ap-photo-area">
-                {profile.photo ? (
-                  <img src={profile.photo} alt="Profile" className="ap-photo-preview" />
-                ) : (
-                  <div className="ap-photo-placeholder">No photo</div>
-                )}
-                <div className="ap-photo-actions">
-                  <label className={`ap-file-btn small${photoProgress !== null ? ' ap-uploading' : ''}`}>
-                    {photoProgress !== null ? (
-                      <span className="ap-progress-wrap">
-                        <span className="ap-progress-bar" style={{ width: `${photoProgress}%` }} />
-                        <span className="ap-progress-label">{photoProgress}%</span>
-                      </span>
-                    ) : (
-                      <>
-                        {profile.photo ? 'Change Photo' : 'Upload Photo'}
-                        <input type="file" accept="image/*"
-                               onChange={(e) => handlePhotoUpload(e.target.files[0])} />
-                      </>
-                    )}
+      {/* Main Content */}
+      <div className="flutter-main-content">
+        <div className="content-header">
+          <h2 style={{ color: 'white', fontSize: '24px', fontWeight: 'bold' }}>{tabs.find(t=>t.id===tab)?.label}</h2>
+          <a href="/" target="_blank" rel="noreferrer" className="flutter-btn secondary">
+            <LinkIcon size={16} /> View Site
+          </a>
+        </div>
+        
+        <div className="content-scroll">
+          {/* PROFILE TAB */}
+          {tab === 'profile' && (
+            <div className="flutter-card">
+              <div className="form-group">
+                <label>Profile Image</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <img src={profile.photo || 'https://via.placeholder.com/150'} style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '2px solid #0ea5e9' }} />
+                  <label className="flutter-btn secondary">
+                    {isUploading ? 'Uploading...' : 'Change Photo'}
+                    <input type="file" hidden accept="image/*" onChange={e => uploadFile(e.target.files[0], url => onProfileChange({...profile, photo: url}))} />
                   </label>
-                  {profile.photo && (
-                    <button className="ap-remove-btn"
-                            onClick={() => onProfileChange({ ...profile, photo: null, photoId: null })}>
-                      Remove
-                    </button>
-                  )}
-                </div>
-                {photoError && <p className="ap-error">{photoError}</p>}
-                <p className="ap-hint">Appears in the Hero section</p>
-              </div>
-            </div>
-
-            {/* Name & Title */}
-            <div className="ap-section">
-              <p className="ap-section-label">Name</p>
-              <input className="ap-input" value={profile.name}
-                     onChange={(e) => onProfileChange({ ...profile, name: e.target.value })} />
-            </div>
-            <div className="ap-section">
-              <p className="ap-section-label">Title / Role</p>
-              <input className="ap-input" value={profile.title}
-                     onChange={(e) => onProfileChange({ ...profile, title: e.target.value })} />
-            </div>
-            <div className="ap-section">
-              <p className="ap-section-label">Location</p>
-              <input className="ap-input" value={profile.location}
-                     onChange={(e) => onProfileChange({ ...profile, location: e.target.value })} />
-            </div>
-            <div className="ap-section">
-              <p className="ap-section-label">Bio</p>
-              <textarea className="ap-input ap-textarea" rows={4} value={profile.bio || ''}
-                        onChange={(e) => onProfileChange({ ...profile, bio: e.target.value })} />
-            </div>
-            
-            {/* Contact Links */}
-            <div className="ap-section">
-              <p className="ap-section-label" style={{borderTop: '1px solid #334155', paddingTop: '1.5rem', marginTop: '1rem'}}>Contact & Social Links</p>
-            </div>
-            <div className="ap-section">
-              <p className="ap-section-label">LinkedIn URL</p>
-              <input className="ap-input" value={profile.linkedin || ''} placeholder="https://linkedin.com/in/..."
-                     onChange={(e) => onProfileChange({ ...profile, linkedin: e.target.value })} />
-            </div>
-            <div className="ap-section">
-              <p className="ap-section-label">WhatsApp Number</p>
-              <input className="ap-input" value={profile.whatsapp || ''} placeholder="+201..."
-                     onChange={(e) => onProfileChange({ ...profile, whatsapp: e.target.value })} />
-            </div>
-            <div className="ap-section">
-              <p className="ap-section-label">Phone Number</p>
-              <input className="ap-input" value={profile.phone || ''} placeholder="+201..."
-                     onChange={(e) => onProfileChange({ ...profile, phone: e.target.value })} />
-            </div>
-            <div className="ap-section">
-              <p className="ap-section-label">Facebook URL</p>
-              <input className="ap-input" value={profile.facebook || ''} placeholder="https://facebook.com/..."
-                     onChange={(e) => onProfileChange({ ...profile, facebook: e.target.value })} />
-            </div>
-
-            <p className="ap-hint" style={{ marginTop: '1rem' }}>Changes save automatically.</p>
-          </div>
-        )}
-
-        {/* ── PROJECTS TAB ── */}
-        {tab === 'projects' && (
-          <div className="ap-body">
-            <div className="ap-section">
-              <p className="ap-section-label">Add New Item</p>
-              <p className="ap-hint" style={{ marginBottom: '1rem' }}>
-                Choose a category → pick your file → it appears in that section instantly.
-              </p>
-              <UploadRow onDone={onAddProject} />
-            </div>
-
-            {/* Existing projects list */}
-            {projects.length > 0 && (
-              <div className="ap-section">
-                <p className="ap-section-label">Manage Items ({projects.length})</p>
-                <div className="ap-items-list">
-                  {projects.map((p) => (
-                    <div key={p.public_id} className="ap-item">
-                      <div className="ap-item-thumb">
-                        {p.pf_type === 'video' ? (
-                          <span className="ap-video-icon">▶</span>
-                        ) : (
-                          <img src={p.secure_url} alt={p.pf_title} />
-                        )}
-                      </div>
-                      <div className="ap-item-info">
-                        <span className="ap-item-title">{p.pf_title}</span>
-                        <span className="ap-item-cat">
-                          {CATEGORIES.find(c => c.id === p.pf_category)?.label || p.pf_category}
-                        </span>
-                      </div>
-                      <button className="ap-item-del" onClick={() => onDeleteProject(p)}>✕</button>
-                    </div>
-                  ))}
                 </div>
               </div>
-            )}
-          </div>
-        )}
-
-        {/* ── DEMOS TAB ── */}
-        {tab === 'demos' && (
-          <div className="ap-body">
-            <div className="ap-section">
-              <p className="ap-section-label">Interactive Modules</p>
-              <p className="ap-hint" style={{ marginBottom: '1rem' }}>
-                Enable and configure interactive modules (like the Wallpaper App mockup) to display on your site.
-              </p>
+              <div className="form-row">
+                <div className="form-group"><label>Full Name</label><input className="flutter-input" value={profile.name} onChange={e => onProfileChange({...profile, name: e.target.value})} /></div>
+                <div className="form-group"><label>Title / Role</label><input className="flutter-input" value={profile.title} onChange={e => onProfileChange({...profile, title: e.target.value})} /></div>
+              </div>
+              <div className="form-group">
+                <label>Bio (About Me)</label>
+                <textarea className="flutter-input" rows="4" value={profile.bio} onChange={e => onProfileChange({...profile, bio: e.target.value})} />
+              </div>
+              <h3 style={{ color: 'white', margin: '2rem 0 1rem', borderBottom: '1px solid #1e293b', paddingBottom: '0.5rem' }}>Social Links</h3>
+              <div className="form-row">
+                <div className="form-group"><label>LinkedIn</label><input className="flutter-input" value={profile.linkedin} onChange={e => onProfileChange({...profile, linkedin: e.target.value})} /></div>
+                <div className="form-group"><label>WhatsApp</label><input className="flutter-input" value={profile.whatsapp} onChange={e => onProfileChange({...profile, whatsapp: e.target.value})} /></div>
+              </div>
             </div>
+          )}
 
-            <div className="ap-section">
-              <p className="ap-section-label">Upload New Module (.html)</p>
-              <label className="ap-file-btn">
-                <span className="ap-plus">+</span> Upload HTML File
-                <input
-                  type="file"
-                  accept=".html"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (evt) => {
-                      const content = evt.target.result;
-                      const newId = 'demo_' + Date.now();
-                      const newDemo = {
-                        moduleId: newId,
-                        enabled: true,
-                        title: file.name.replace('.html', '').replace(/[-_]/g, ' '),
-                        description: 'A new interactive module uploaded to your portfolio.',
-                        alignment: 'left',
-                        htmlContent: content
-                      };
-                      onDemosChange([newDemo, ...demos]);
-                    };
-                    reader.readAsText(file);
-                    e.target.value = ''; // reset
-                  }}
-                />
-              </label>
-            </div>
-
-            <div className="ap-section" style={{ marginTop: '1rem' }}>
-              <p className="ap-section-label">Manage Modules</p>
-            </div>
-
-            {demos.map(demo => {
-              const isEnabled = demo.enabled;
-
-              const updateDemo = (updates) => {
-                const next = demos.map(d => d.moduleId === demo.moduleId ? { ...d, ...updates } : d);
-                onDemosChange(next);
-              };
-
-              const deleteDemo = () => {
-                if (confirm('Are you sure you want to remove this module?')) {
-                  const next = demos.filter(d => d.moduleId !== demo.moduleId);
-                  onDemosChange(next);
-                }
-              };
-
-              return (
-                <div key={demo.moduleId} className="ap-section" style={{ background: 'var(--c-elevated)', padding: '1rem', border: '1px solid var(--c-border)', clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <p style={{ color: 'var(--txt-1)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'capitalize' }}>{demo.title}</p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>
-                        <input type="checkbox" checked={isEnabled} onChange={(e) => updateDemo({ enabled: e.target.checked })} />
-                        <span className="ap-hint">Enable</span>
-                      </label>
-                      <button className="ap-remove-btn" onClick={deleteDemo}>✕</button>
+          {/* PROJECTS TAB (Modules) */}
+          {tab === 'projects' && (
+            <div className="list-manager">
+              <button className="flutter-btn primary" onClick={() => onProjectsChange([{ id: Date.now(), title: '', description: '', url: '', technologies: [], links: [] }, ...projects])}>
+                <Plus size={16} /> Add New Module (Project)
+              </button>
+              
+              {projects.map((proj, idx) => (
+                <div key={proj.id || idx} className="flutter-card item-card">
+                  <div className="item-header">
+                    <h3 style={{ color: 'white' }}>{proj.title || 'Untitled Module'}</h3>
+                    <button className="icon-btn danger" onClick={() => onProjectsChange(projects.filter((_, i) => i !== idx))}><Trash2 size={16} /></button>
+                  </div>
+                  
+                  <div className="form-row">
+                    <div className="form-group"><label>Title</label><input className="flutter-input" value={proj.title} onChange={e => {
+                      const n = [...projects]; n[idx].title = e.target.value; onProjectsChange(n);
+                    }} /></div>
+                    <div className="form-group">
+                      <label>Image</label>
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        {proj.url && <img src={proj.url} style={{ height: 40, borderRadius: 4 }} />}
+                        <label className="flutter-btn secondary small" style={{flex: 1, textAlign: 'center'}}>
+                          {isUploading ? 'Uploading...' : 'Upload Image'}
+                          <input type="file" hidden accept="image/*" onChange={e => uploadFile(e.target.files[0], url => {
+                            const n = [...projects]; n[idx].url = url; onProjectsChange(n);
+                          })} />
+                        </label>
+                      </div>
                     </div>
                   </div>
+                  
+                  <div className="form-group">
+                    <label>Description</label>
+                    <textarea className="flutter-input" rows="2" value={proj.description || ''} onChange={e => {
+                      const n = [...projects]; n[idx].description = e.target.value; onProjectsChange(n);
+                    }} />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label>Technologies (Comma separated, e.g. Flutter, Firebase)</label>
+                    <input className="flutter-input" value={(proj.technologies || []).join(', ')} onChange={e => {
+                      const n = [...projects]; n[idx].technologies = e.target.value.split(',').map(s=>s.trim()).filter(Boolean); onProjectsChange(n);
+                    }} />
+                  </div>
 
-                  {isEnabled && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                      <div>
-                        <p className="ap-hint" style={{ marginBottom: '4px' }}>Title</p>
-                        <input className="ap-input" value={demo.title} onChange={(e) => updateDemo({ title: e.target.value })} />
-                      </div>
-                        <div>
-                          <p className="ap-hint" style={{ marginBottom: '4px' }}>Description</p>
-                          <textarea className="ap-input ap-textarea" value={demo.description} onChange={(e) => updateDemo({ description: e.target.value })} rows={3} />
-                        </div>
-                        <div>
-                          <p className="ap-hint" style={{ marginBottom: '4px' }}>Action Buttons (e.g., GitHub, Live Link)</p>
-                          {(demo.links || []).map((link, idx) => (
-                            <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                              <input className="ap-input" style={{flex: 1}} placeholder="Label (e.g. GitHub)" value={link.label} onChange={(e) => {
-                                const newLinks = [...(demo.links || [])];
-                                newLinks[idx].label = e.target.value;
-                                updateDemo({ links: newLinks });
-                              }} />
-                              <input className="ap-input" style={{flex: 2}} placeholder="URL (https://...)" value={link.url} onChange={(e) => {
-                                const newLinks = [...(demo.links || [])];
-                                newLinks[idx].url = e.target.value;
-                                updateDemo({ links: newLinks });
-                              }} />
-                              <button className="ap-remove-btn" style={{padding: '0 12px'}} onClick={() => {
-                                const newLinks = demo.links.filter((_, i) => i !== idx);
-                                updateDemo({ links: newLinks });
-                              }}>✕</button>
-                            </div>
-                          ))}
-                          <button className="ap-file-btn small" style={{marginTop: '4px', width: 'auto', display: 'inline-block'}} onClick={() => {
-                            const newLinks = [...(demo.links || []), { label: '', url: '' }];
-                            updateDemo({ links: newLinks });
-                          }}>+ Add Button</button>
-                        </div>
-                      <div>
-                        <p className="ap-hint" style={{ marginBottom: '4px' }}>Layout Alignment</p>
-                        <select className="ap-select" value={demo.alignment} onChange={(e) => updateDemo({ alignment: e.target.value })}>
-                          <option value="left">Mockup on Left, Text on Right</option>
-                          <option value="right">Mockup on Right, Text on Left</option>
-                        </select>
-                      </div>
+                  <div className="dynamic-links-section" style={{ background: '#0f172a', padding: '15px', borderRadius: '8px', marginTop: '1rem', border: '1px solid #1e293b' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <label style={{ margin: 0, color: '#0ea5e9' }}>Dynamic Action Buttons (Links)</label>
+                      <button className="flutter-btn secondary small" onClick={() => {
+                        const n = [...projects];
+                        if (!n[idx].links) n[idx].links = [];
+                        n[idx].links.push({ label: 'GitHub', url: '' });
+                        onProjectsChange(n);
+                      }}><Plus size={14} /> Add Button</button>
                     </div>
-                  )}
+                    
+                    {(proj.links || []).map((link, lIdx) => (
+                      <div key={lIdx} style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                        <input className="flutter-input" style={{flex: 1}} placeholder="Label (e.g. GitHub)" value={link.label} onChange={e => {
+                          const n = [...projects]; n[idx].links[lIdx].label = e.target.value; onProjectsChange(n);
+                        }} />
+                        <input className="flutter-input" style={{flex: 2}} placeholder="https://..." value={link.url} onChange={e => {
+                          const n = [...projects]; n[idx].links[lIdx].url = e.target.value; onProjectsChange(n);
+                        }} />
+                        <button className="icon-btn danger" onClick={() => {
+                          const n = [...projects]; n[idx].links.splice(lIdx, 1); onProjectsChange(n);
+                        }}><Trash2 size={16} /></button>
+                      </div>
+                    ))}
+                    {!(proj.links && proj.links.length > 0) && <p style={{ color: '#64748b', fontSize: '12px' }}>No buttons added yet. Click "Add Button".</p>}
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-          </>
-        )}
+              ))}
+            </div>
+          )}
+
+          {/* DYNAMIC LIST TEMPLATES (Services, Experience, Certificates, Tech Stack, Stats) */}
+          {['services', 'experience', 'certificates', 'techStack', 'stats'].includes(tab) && (() => {
+            const stateMap = {
+              services: { data: services, setter: onServicesChange, fields: [{key: 'title', label: 'Title'}, {key: 'description', label: 'Description'}, {key: 'icon', label: 'Icon Name (e.g. code, mobileScreen)'}] },
+              experience: { data: experience, setter: onExperienceChange, fields: [{key: 'title', label: 'Job Title'}, {key: 'company', label: 'Company'}, {key: 'period', label: 'Period (e.g. 2024 - Present)'}, {key: 'description', label: 'Description'}] },
+              certificates: { data: certificates, setter: onCertificatesChange, fields: [{key: 'title', label: 'Certificate Name'}, {key: 'platform', label: 'Platform (e.g. Udemy)'}, {key: 'date', label: 'Date (Year)'}, {key: 'icon', label: 'Icon Name'}] },
+              techStack: { data: techStack, setter: onTechStackChange, fields: [{key: 'title', label: 'Category Title'}, {key: 'icon', label: 'Icon'}, {key: 'skills', label: 'Skills (Comma separated)'}] },
+              stats: { data: stats, setter: onStatsChange, fields: [{key: 'title', label: 'Number (e.g. 4+)'}, {key: 'subtitle', label: 'Subtitle'}, {key: 'icon', label: 'Icon'}] }
+            };
+            
+            const current = stateMap[tab];
+            
+            return (
+              <div className="list-manager">
+                <button className="flutter-btn primary" onClick={() => current.setter([{ id: Date.now() }, ...current.data])}>
+                  <Plus size={16} /> Add New Entry
+                </button>
+                {current.data.map((item, idx) => (
+                  <div key={item.id || idx} className="flutter-card item-card" style={{ display: 'flex', gap: '15px', alignItems: 'flex-start' }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {current.fields.map(f => (
+                        <div key={f.key}>
+                          <label style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px', display: 'block' }}>{f.label}</label>
+                          {f.key === 'description' ? (
+                            <textarea className="flutter-input" rows="2" value={item[f.key] || ''} onChange={e => {
+                              const n = [...current.data]; n[idx][f.key] = e.target.value; current.setter(n);
+                            }} />
+                          ) : (
+                            <input className="flutter-input" value={f.key === 'skills' ? (item[f.key] || []).join(', ') : (item[f.key] || '')} onChange={e => {
+                              const n = [...current.data]; 
+                              n[idx][f.key] = f.key === 'skills' ? e.target.value.split(',').map(s=>s.trim()).filter(Boolean) : e.target.value;
+                              current.setter(n);
+                            }} />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <button className="icon-btn danger" onClick={() => current.setter(current.data.filter((_, i) => i !== idx))}><Trash2 size={18} /></button>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+
+        </div>
       </div>
     </div>
   );

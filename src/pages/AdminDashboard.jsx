@@ -69,7 +69,7 @@ export default function AdminDashboard({
     { id: 'services', icon: Briefcase, label: 'Services' },
     { id: 'experience', icon: FileText, label: 'Experience' },
     { id: 'certificates', icon: Award, label: 'Certificates' },
-    { id: 'tech', icon: Settings, label: 'Tech Stack' },
+    { id: 'techStack', icon: Settings, label: 'Tech Stack' },
     { id: 'stats', icon: BarChart, label: 'Stats' },
   ];
 
@@ -208,6 +208,35 @@ export default function AdminDashboard({
                       </div>
                     ))}
                     {!(proj.links && proj.links.length > 0) && <p style={{ color: '#64748b', fontSize: '12px' }}>No buttons added yet. Click "Add Button".</p>}
+                  </div>
+
+                  <div className="dynamic-modules-section" style={{ background: '#0f172a', padding: '15px', borderRadius: '8px', marginTop: '1rem', border: '1px solid #1e293b' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <label style={{ margin: 0, color: '#0ea5e9' }}>Course Modules (وحدات الدورة)</label>
+                      <button className="flutter-btn secondary small" onClick={() => {
+                        const n = [...projects];
+                        if (!n[idx].modules) n[idx].modules = [];
+                        n[idx].modules.push({ title: '', description: '' });
+                        onProjectsChange(n);
+                      }}><Plus size={14} /> Add Module</button>
+                    </div>
+                    
+                    {(proj.modules || []).map((mod, mIdx) => (
+                      <div key={mIdx} style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '10px', background: '#1e293b', padding: '10px', borderRadius: '4px' }}>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                          <input className="flutter-input" style={{flex: 1}} placeholder="Module Title" value={mod.title} onChange={e => {
+                            const n = [...projects]; n[idx].modules[mIdx].title = e.target.value; onProjectsChange(n);
+                          }} />
+                          <button className="icon-btn danger" onClick={() => {
+                            const n = [...projects]; n[idx].modules.splice(mIdx, 1); onProjectsChange(n);
+                          }}><Trash2 size={16} /></button>
+                        </div>
+                        <textarea className="flutter-input" rows="2" placeholder="Module Description" value={mod.description} onChange={e => {
+                          const n = [...projects]; n[idx].modules[mIdx].description = e.target.value; onProjectsChange(n);
+                        }} />
+                      </div>
+                    ))}
+                    {!(proj.modules && proj.modules.length > 0) && <p style={{ color: '#64748b', fontSize: '12px' }}>No modules added yet.</p>}
                   </div>
                 </div>
               ))}

@@ -3,7 +3,7 @@
     "name": "Mohamed Refky",
     "title": "Flutter Developer | Mobile App Engineer",
     "description": "I build scalable mobile applications using Flutter, Clean Architecture, and AI integrations.",
-    "about": "Computer Science graduate and Flutter Developer with hands-on experience building scalable mobile applications. Passionate about sharing knowledge as a Coding Instructor and continuously growing through professional projects.",
+    "about": "Computer Science graduate (Ranked first in my class) and Flutter Developer with hands-on experience building scalable mobile applications. Passionate about sharing knowledge as a Coding Instructor and continuously growing through professional projects.",
     "image": "assets/images/my_image.jpg",
     "cv": "https://drive.google.com/file/d/1o4O1oOJMVoQpqk9DghUuFOFuRJt7Oox4/view?usp=drive_link",
     "github": "https://github.com/MohamedRefky",
@@ -58,16 +58,16 @@
   ],
   "experience": [
     {
-      "title": "Coding Instructor & Mentor",
-      "company": "iSchool",
-      "period": "April 2026 – Present",
-      "description": "Selected for the position after successfully passing the rigorous DEMI evaluation phase to instruct students in programming fundamentals."
+      "title": "Coding Instructor",
+      "company": "Village Youth Center",
+      "period": "2 Years",
+      "description": "Taught programming to kids at the village youth center for 2 years."
     },
     {
-      "title": "Flutter Developer (Freelance)",
-      "company": "Remote",
-      "period": "April 2026 – Present",
-      "description": "Developed and delivered scalable, cross-platform mobile solutions including the Eduon LMS platform."
+      "title": "Flutter Developer",
+      "company": "Mobile App Development",
+      "period": "2 Years",
+      "description": "2 years of experience in mobile app development using Flutter."
     }
   ],
   "projects": [

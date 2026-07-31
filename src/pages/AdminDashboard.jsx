@@ -140,7 +140,16 @@ export default function AdminDashboard({
               </div>
               <div className="form-row">
                 <div className="form-group"><label>Phone</label><input className="flutter-input" placeholder="+201019964918" value={profile.phone || ''} onChange={e => onProfileChange({...profile, phone: e.target.value})} /></div>
-                <div className="form-group"></div>
+                <div className="form-group">
+                  <label>CV (PDF / Image)</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    {profile.cv && <a href={profile.cv} target="_blank" rel="noreferrer" style={{color: '#0ea5e9'}}>View Current CV</a>}
+                    <label className="flutter-btn secondary small">
+                      {isUploading ? 'Uploading...' : 'Upload CV'}
+                      <input type="file" hidden accept=".pdf,image/*" onChange={e => uploadFile(e.target.files[0], url => onProfileChange({...profile, cv: url}))} />
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
           )}

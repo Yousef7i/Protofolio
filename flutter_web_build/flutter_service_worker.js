@@ -3,13 +3,14 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"assets/AssetManifest.bin": "d187f5194cc20f9ab6b41bfc0e8fe590",
-"assets/AssetManifest.bin.json": "52965e5458fdae1a460097de7d863795",
-"assets/AssetManifest.json": "681a23f3628b1b92afdd1a2321019100",
-"assets/assets/data/portfolio_data.json": "6bafbd9c3bf68b28578c1ad126362091",
+const RESOURCES = {"assets/AssetManifest.bin": "fad81b2355d2b1de44894cad85ac8693",
+"assets/AssetManifest.bin.json": "53a0611b6506355cd87f55de4d78bbb2",
+"assets/AssetManifest.json": "3708a484a1bb604f2b493132a5630fb5",
+"assets/assets/data/portfolio_data.json": "752f756617b5860b197e3b8c05d31d0e",
 "assets/assets/images/Diety.jpeg": "761c87273e7fce9eac8baacf75330018",
 "assets/assets/images/EDUON.jpeg": "98df57336aeb81e6376de7a68ede5349",
 "assets/assets/pdf/cv.pdf": "1a984ed2efd052ba721127c74ea050d7",
+"assets/assets/pdf/MG.pdf": "200d9c1517fcfa73e454855cc0055bc4",
 "assets/FontManifest.json": "c75f7af11fb9919e042ad2ee704db319",
 "assets/fonts/MaterialIcons-Regular.otf": "e7069dfd19b331be16bed984668fe080",
 "assets/NOTICES": "7e77d337d0c2c6716e00afbd9fe14fd9",
@@ -32,7 +33,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "d187f5194cc20f9ab6b41bfc0e8fe590
 "canvaskit/skwasm_heavy.wasm": "8034ad26ba2485dab2fd49bdd786837b",
 "cv.pdf": "868930ed93a66ad03bd7de810a2dcdce",
 "flutter.js": "888483df48293866f9f41d3d9274a779",
-"flutter_bootstrap.js": "fb9e033443a2f05e3d98bb02733b99db",
+"flutter_bootstrap.js": "d03888c1c31e6b808b2136902405e04a",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
 "icons/Icon-maskable-192.png": "c457ef57daa1d16f64b27b786ec2ea3c",

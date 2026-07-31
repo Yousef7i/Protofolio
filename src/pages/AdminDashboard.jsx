@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { uploadToCloudinary } from '../lib/cloudinary';
 import { auth, storage } from '../lib/firebase';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { Save, Plus, Trash2, Link as LinkIcon, LogOut, LayoutDashboard, Briefcase, FileText, Award, BarChart, Settings, User, Upload } from 'lucide-react';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { Save, Plus, Trash2, Link as LinkIcon, LogOut, LayoutDashboard, Briefcase, FileText, Award, BarChart, Settings, User } from 'lucide-react';
 
 export default function AdminDashboard({
   profile, onProfileChange,
@@ -52,16 +52,13 @@ export default function AdminDashboard({
     setIsUploading(true);
     try {
       const storageRef = ref(storage, `cv/${file.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on('state_changed', () => {}, (error) => { throw error; }, async () => {
-        const url = await getDownloadURL(uploadTask.snapshot.ref);
-        callback(url);
-        setIsUploading(false);
-      });
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      callback(url);
     } catch (e) {
       alert("CV Upload failed: " + e.message);
-      setIsUploading(false);
     }
+    setIsUploading(false);
   };
 
   if (!user) {
@@ -161,12 +158,11 @@ export default function AdminDashboard({
                 <div className="form-group">
                   <label>CV (Upload PDF)</label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <label className="flutter-btn primary small" style={{whiteSpace: 'nowrap', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'}}>
-                      <Upload size={14} />
-                      {isUploading ? 'Uploading...' : 'Upload CV (PDF)'}
+                    <label className="flutter-btn primary small" style={{whiteSpace: 'nowrap', cursor: 'pointer'}}>
+                      {isUploading ? 'Uploading...' : '📄 Upload CV (PDF)'}
                       <input type="file" hidden accept=".pdf" onChange={e => uploadCvToFirebase(e.target.files[0], url => onProfileChange({...profile, cv: url}))} />
                     </label>
-                    {profile.cv && <a href={profile.cv} target="_blank" rel="noreferrer" style={{color: '#0ea5e9', whiteSpace: 'nowrap', fontSize: '13px'}}>✓ View Current CV</a>}
+                    {profile.cv && <a href={profile.cv} target="_blank" rel="noreferrer" style={{color: '#0ea5e9', whiteSpace: 'nowrap', fontSize: '13px'}}>✅ View Current CV</a>}
                   </div>
                 </div>
               </div>

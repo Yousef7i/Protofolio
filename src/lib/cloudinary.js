@@ -19,7 +19,8 @@ export async function uploadToCloudinary(file, onProgress) {
     throw new Error('Cloudinary not configured. Add credentials to .env');
   }
 
-  const resourceType = 'auto';
+  const isRaw = file.type === 'application/pdf' || file.name.endsWith('.pdf') || file.name.endsWith('.zip');
+  const resourceType = isRaw ? 'raw' : 'auto';
   const url = `https://api.cloudinary.com/v1_1/${CLOUD()}/${resourceType}/upload`;
 
   const fd = new FormData();

@@ -39023,7 +39023,7 @@ o.xo()
 case 1:return A.M(q,r)}})
 return A.N($async$oS,r)},
 K(a){var s,r=null,q=A.el(B.r,4),p=A.c([new A.cf(5,B.aj,B.r.aR(0.5),B.j,30)],t.E),o=A.cO(75)
-if(A.F0().length===0)s=B.DN
+if(A.F0().length===0)s=B.DO
 else s=B.c.aL(A.F0(),"http")?A.arM(A.F0(),B.d4):A.arL(A.F0(),B.d4)
 return A.ao_(B.Aq,A.vG(A.d7(A.c([A.d9(A.t2(A.cK(A.bF(r,A.Xm(o,s),B.l,r,r,new A.bB(r,r,q,r,p,r,B.b3),r,150,r,r,r,r,150),r,r),r,B.zy,A.aI(6e5,0),r),r,r),B.Mg,A.mq(A.d9(A.cK(A.bN(A.F1().toUpperCase(),r,r,B.PI,r),A.aI(2e5,0),r),r,A.aI(6e5,0)),0.5,0),B.e4,A.ati(A.d9(A.cK(A.eW(A.Xm(A.cO(10),B.EF),r,150),A.aI(4e5,0),r),r,r),0,r,r,1)],t.p),B.A,B.cA,B.J),r,r),r,r)}}
 A.ajy.prototype={
@@ -39777,7 +39777,7 @@ r=B.c.q(n,"DEMO")||B.c.q(n,"LIVE")
 if(B.c.q(n,"GITHUB"))q=B.CG
 else if(B.c.q(n,"FIGMA"))q=B.CI
 else if(B.c.q(n,"STORE")||B.c.q(n,"PLAY"))q=B.CH
-else q=B.c.q(n,"APP STORE")||B.c.q(n,"APPLE")?B.CE:B.DM
+else q=B.c.q(n,"APP STORE")||B.c.q(n,"APPLE")?B.CE:B.DN
 if(r)return new A.ne(n,new A.ahR(this,n,s),q,null)
 else{p=p.h(a,"label")
 if(p==null)p="Link"
@@ -39834,8 +39834,8 @@ $0(){return this.a.d=!1},
 $S:0}
 A.ahX.prototype={
 $1(a){var s="title",r=J.a2(a)
-r=r.h(a,s)==null||B.c.r_(J.bI(r.h(a,s))).length===0?"View Demo":J.bI(r.h(a,s))
-return new A.ne(r,new A.ahW(this.a,a),B.DO,null)},
+r=r.h(a,s)==null||B.c.r_(J.bI(r.h(a,s))).length===0?"Press here to view demo":J.bI(r.h(a,s))
+return new A.ne(r,new A.ahW(this.a,a),B.DM,null)},
 $S:337}
 A.ahW.prototype={
 $0(){var s,r="fileUrl",q=this.b,p=J.a2(q)
@@ -78116,13 +78116,13 @@ B.DJ=new A.cS(null,null,null,null,null,B.i,null,null,null)
 B.DK=new A.cS(null,null,null,null,null,B.k,null,null,null)
 B.Dc=new A.bd(984413,"MaterialIcons",null,!1)
 B.DL=new A.i2(B.Dc,20,null,null,null,null,null,null,null,null,null,null,null,null)
+B.D7=new A.bd(58573,"MaterialIcons",null,!1)
+B.DM=new A.i2(B.D7,16,null,null,null,null,B.E,null,null,null,null,null,null,null)
 B.D4=new A.bd(58460,"MaterialIcons",null,!0)
-B.DM=new A.i2(B.D4,16,null,null,null,null,null,null,null,null,null,null,null,null)
+B.DN=new A.i2(B.D4,16,null,null,null,null,null,null,null,null,null,null,null,null)
 B.D5=new A.bd(58513,"MaterialIcons",null,!1)
 B.Au=new A.C(0.5411764705882353,1,1,1,B.h)
-B.DN=new A.i2(B.D5,80,null,null,null,null,B.Au,null,null,null,null,null,null,null)
-B.D7=new A.bd(58560,"MaterialIcons",null,!1)
-B.DO=new A.i2(B.D7,16,null,null,null,null,B.E,null,null,null,null,null,null,null)
+B.DO=new A.i2(B.D5,80,null,null,null,null,B.Au,null,null,null,null,null,null,null)
 B.D1=new A.bd(57695,"MaterialIcons",null,!0)
 B.lS=new A.i2(B.D1,24,null,null,null,null,B.Q,null,null,null,null,null,null,null)
 B.D0=new A.bd(57492,"MaterialIcons",null,!0)

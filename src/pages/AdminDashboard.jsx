@@ -141,13 +141,14 @@ export default function AdminDashboard({
               <div className="form-row">
                 <div className="form-group"><label>Phone</label><input className="flutter-input" placeholder="+201019964918" value={profile.phone || ''} onChange={e => onProfileChange({...profile, phone: e.target.value})} /></div>
                 <div className="form-group">
-                  <label>CV (PDF / Image)</label>
+                  <label>CV Link (Google Drive URL or Upload Image)</label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    {profile.cv && <a href={profile.cv} target="_blank" rel="noreferrer" style={{color: '#0ea5e9'}}>View Current CV</a>}
-                    <label className="flutter-btn secondary small">
-                      {isUploading ? 'Uploading...' : 'Upload CV'}
-                      <input type="file" hidden accept=".pdf,image/*" onChange={e => uploadFile(e.target.files[0], url => onProfileChange({...profile, cv: url}))} />
+                    <input className="flutter-input" style={{flex: 1}} placeholder="https://drive.google.com/..." value={profile.cv || ''} onChange={e => onProfileChange({...profile, cv: e.target.value})} />
+                    <label className="flutter-btn secondary small" style={{whiteSpace: 'nowrap'}}>
+                      {isUploading ? 'Uploading...' : 'Upload as Image'}
+                      <input type="file" hidden accept="image/*" onChange={e => uploadFile(e.target.files[0], url => onProfileChange({...profile, cv: url}))} />
                     </label>
+                    {profile.cv && <a href={profile.cv} target="_blank" rel="noreferrer" style={{color: '#0ea5e9', whiteSpace: 'nowrap'}}>Test Link</a>}
                   </div>
                 </div>
               </div>

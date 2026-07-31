@@ -38896,7 +38896,7 @@ return A.d7(A.c([A.mq(A.d9(A.cK(A.qN(B.H,A.bN(this.c,s,s,A.fy(s,s,B.i,s,s,s,s,s,
 A.Jj.prototype={
 K(a){var s=null,r=A.aDf(A.abR(B.a2,s,s,s,s,s,s,s).ok),q=A.awm().$2$color$fontWeight(B.i,B.a9),p=A.awm().$2$color$fontWeight(B.i,B.a9)
 p=r.a6J(A.awl().$1$color(B.i),A.awl().$1$color(B.aW),q,p)
-return new A.xY(B.Mp,new A.a6J(),"Mohamed Refky - Portfolio",A.abR(B.a2,B.zR,B.A0,new A.qE(A.an3(s,s,B.r,s,s,s,s,s,s,B.i,s,s,B.BS,s,new A.cI(A.cO(12),B.p),s,s,s,s,s)),B.r,B.k,p,s),!1,s)}}
+return new A.xY(B.Mp,new A.a6J(),"Mohamed Ghanem - Portfolio",A.abR(B.a2,B.zR,B.A0,new A.qE(A.an3(s,s,B.r,s,s,s,s,s,s,B.i,s,s,B.BS,s,new A.cI(A.cO(12),B.p),s,s,s,s,s)),B.r,B.k,p,s),!1,s)}}
 A.a6J.prototype={
 $2(a,b){b.toString
 return new A.z3(b,A.c([B.ys,B.yt,B.yu,B.yv],t.At),null,null,!1,!1,null)},

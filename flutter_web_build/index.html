@@ -171,15 +171,34 @@
         }, 100);
       }
     }
+
+    async function fetchProfileForSplash() {
+      try {
+        const res = await fetch('https://firestore.googleapis.com/v1/projects/protofolio-10ae6/databases/(default)/documents/portfolio/profile');
+        const data = await res.json();
+        const name = data?.fields?.name?.stringValue;
+        const photo = data?.fields?.photo?.stringValue;
+        
+        if (name) {
+          document.getElementById('splash-name').innerText = name.toUpperCase();
+        }
+        if (photo) {
+          document.getElementById('splash-img').src = photo;
+        }
+      } catch (e) {
+        console.warn('Could not fetch profile for splash screen', e);
+      }
+    }
+    fetchProfileForSplash();
   </script>
 </head>
 <body>
   <div id="splash">
     <div class="profile-container">
       <div class="glow"></div>
-      <img src="my_image.jpg" class="profile-img" alt="Mohamed Refky">
+      <img src="my_image.jpg" class="profile-img" id="splash-img" alt="Profile">
     </div>
-    <div class="name-text">MOHAMED REFKY</div>
+    <div class="name-text" id="splash-name">MOHAMED GHANEM</div>
     <div class="loading-bar">
       <div class="loading-fill"></div>
     </div>

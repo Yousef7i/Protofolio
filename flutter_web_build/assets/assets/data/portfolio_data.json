@@ -1,16 +1,16 @@
 {
   "personalInfo": {
-    "name": "Mohamed Hamada Ghanem",
-    "title": "Mobile Software Engineer | Flutter & Dart Specialist",
-    "description": "Results-driven Mobile Software Engineer specializing in Flutter and Dart.",
-    "about": "Results-driven Mobile Software Engineer specializing in Flutter and Dart, with hands-on experience architecting high-performance, cross-platform applications for Android and iOS. Expert in implementing Clean Architecture, advanced state management (BLoC, Freezed), and secure RESTful API integrations.",
+    "name": "Mohamed Ghanem",
+    "title": "Flutter Developer | Mobile App Engineer",
+    "description": "I build scalable mobile applications using Flutter, Clean Architecture, and AI integrations.",
+    "about": "Computer Science graduate (Ranked first in my class) and Flutter Developer with hands-on experience building scalable mobile applications. Passionate about sharing knowledge as a Coding Instructor and continuously growing through professional projects.",
     "image": "assets/images/my_image.jpg",
     "cv": "https://drive.google.com/file/d/1o4O1oOJMVoQpqk9DghUuFOFuRJt7Oox4/view?usp=drive_link",
-    "github": "https://github.com/Mohamed-Ghanem155",
-    "linkedin": "https://www.linkedin.com/in/mohamed-ghanem-6838a6302",
-    "email": "tryhackme955@gmail.com",
-    "whatsappNumber": "+201212686995",
-    "phone": "+201212686995"
+    "github": "https://github.com/MohamedRefky",
+    "linkedin": "https://www.linkedin.com/in/mohamedrefky/",
+    "email": "mohamedrifky9765@gmail.com",
+    "whatsappNumber": "+201019964918",
+    "phone": "+201019964918"
   },
   "stats": [
     {
@@ -58,96 +58,90 @@
   ],
   "experience": [
     {
-      "description": "Architected and deployed high-performance cross-platform mobile applications using the Flutter SDK and Dart. Engineered scalable app architectures utilizing Clean Architecture and Dependency Injection.",
-      "company": "Freelance / Projects",
-      "period": "2024 - Present",
-      "title": "Mobile Software Engineer (Flutter) - Project Based Experience"
+      "title": "Coding Instructor",
+      "company": "Village Youth Center",
+      "period": "2 Years",
+      "description": "Taught programming to kids at the village youth center for 2 years."
+    },
+    {
+      "title": "Flutter Developer",
+      "company": "Mobile App Development",
+      "period": "2 Years",
+      "description": "2 years of experience in mobile app development using Flutter."
     }
   ],
   "projects": [
     {
-      "githubUrl": "https://github.com/Mohamed-Ghanem155/Protofolio",
+      "title": "Eduon LMS",
+      "description": "A comprehensive learning platform featuring YouTube API integration, structured roadmaps, and a community hub for tech organizations.",
       "imageUrl": "assets/images/EDUON.jpeg",
-      "title": "Educational & Religious Courses Platform",
-      "description": "Engineered a comprehensive multi-role e-learning platform (Admin, Supervisor, Student) with secure access controls and dynamic, role-specific dashboards.",
-      "playStoreUrl": null,
       "technologies": [
         "Flutter",
-        "BLoC",
-        "Freezed",
+        "Dart",
+        "YouTube API",
         "Clean Architecture",
-        "REST API"
-      ]
+        "BLoC"
+      ],
+      "playStoreUrl": null,
+      "githubUrl": "https://github.com/MohamedRefky/Eduon"
     },
     {
-      "githubUrl": null,
+      "title": "Diety App",
+      "description": "AI-powered fitness assistant using Gemini AI and Machine Learning (Decision Tree) to provide personalized diet plans.",
       "imageUrl": "assets/images/Diety.jpeg",
-      "title": "AI-Powered MRI Contrast Enhancement Application",
-      "description": "Developing an innovative healthcare solution that leverages AI to transform standard MRI scans into Contrast-Enhanced medical images.",
-      "playStoreUrl": null,
       "technologies": [
         "Flutter",
-        "Medical Image Processing",
-        "AI Integration",
-        "REST API"
-      ]
-    },
-    {
-      "githubUrl": null,
-      "imageUrl": "assets/images/Diety.jpeg",
-      "title": "Comprehensive Healthcare & Medical Booking System",
-      "description": "Architected a robust medical scheduling application supporting three specialized user roles: Doctor, Patient, and Nurse.",
+        "Gemini AI",
+        "Python Flask",
+        "Firebase",
+        "ML"
+      ],
       "playStoreUrl": null,
-      "technologies": [
-        "Flutter",
-        "Role-Based Access Control",
-        "BLoC",
-        "UI/UX"
-      ]
-    },
-    {
-      "githubUrl": null,
-      "imageUrl": "assets/images/Diety.jpeg",
-      "title": "HD Wallpapers App (Pexels API Integration)",
-      "description": "Developed a dynamic media application integrated with the Pexels API for real-time wallpaper fetching.",
-      "playStoreUrl": null,
-      "technologies": [
-        "Flutter",
-        "REST API",
-        "Media Caching"
-      ]
-    },
-    {
-      "githubUrl": null,
-      "imageUrl": "assets/images/Diety.jpeg",
-      "title": "Premium Hotel Booking Application",
-      "description": "Created a responsive hotel reservation platform featuring complex search algorithms, filtering, and booking workflows.",
-      "playStoreUrl": null,
-      "technologies": [
-        "Flutter",
-        "Custom Animations",
-        "API Integration"
-      ]
+      "githubUrl": "https://github.com/MohamedRefky/Diety_app"
     }
   ],
   "certificates": [
     {
-      "icon": "flutter",
-      "platform": "",
-      "title": "The Complete Flutter Development Bootcamp with Dart",
-      "date": ""
+      "title": "Mastering Clean Architecture & SOLID Principles",
+      "platform": "Usama Elgendy",
+      "date": "2026",
+      "icon": "layerGroup"
     },
     {
-      "icon": "layerGroup",
-      "platform": "",
-      "title": "Advanced Flutter: BLoC, Freezed, and Clean Architecture",
-      "date": ""
+      "title": "Flutter Master Course: From Zero To Hero",
+      "platform": "Usama Elgendy",
+      "date": "",
+      "icon": "flutter"
     },
     {
-      "icon": "bolt",
-      "platform": "",
-      "title": "Mobile App Development with Flutter & Firebase",
-      "date": ""
+      "title": "Dart Programming & OOP for Absolute Beginners",
+      "platform": "Usama Elgendy",
+      "date": "",
+      "icon": "code"
+    },
+    {
+      "title": "The Ultimate Git & GitHub Course",
+      "platform": "Usama Elgendy",
+      "date": "",
+      "icon": "github"
+    },
+    {
+      "title": "Bachelor's in Computer Science (A+)",
+      "platform": "Benha University",
+      "date": "2024",
+      "icon": "graduationCap"
+    },
+    {
+      "title": "Flutter & Dart Full Development Diploma",
+      "platform": "EraaSoft",
+      "date": "2024",
+      "icon": "laptopCode"
+    },
+    {
+      "title": "Flutter & Dart Complete Development Courses",
+      "platform": "Udemy, Tharwat Samy",
+      "date": "2023",
+      "icon": "laptopCode"
     }
   ],
   "expertise": [
@@ -260,17 +254,17 @@
     },
     {
       "platform": "LinkedIn",
-      "url": "https://www.linkedin.com/in/mohamed-ghanem-6838a6302",
+      "url": "https://www.linkedin.com/in/mohamedrefky",
       "icon": "linkedin"
     },
     {
       "platform": "WhatsApp",
-      "url": "https://wa.me/201212686995",
+      "url": "https://wa.me/201019964918",
       "icon": "whatsapp"
     },
     {
       "platform": "Email",
-      "url": "mailto:tryhackme955@gmail.com",
+      "url": "mailto:mohamedrifky9765@gmail.com",
       "icon": "email"
     }
   ]

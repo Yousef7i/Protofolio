@@ -183,7 +183,9 @@
           document.getElementById('splash-name').innerText = name.toUpperCase();
         }
         if (photo) {
-          document.getElementById('splash-img').src = photo;
+          const img = document.getElementById('splash-img');
+          img.onload = () => img.style.opacity = '1';
+          img.src = photo;
         }
       } catch (e) {
         console.warn('Could not fetch profile for splash screen', e);
@@ -196,7 +198,7 @@
   <div id="splash">
     <div class="profile-container">
       <div class="glow"></div>
-      <img src="my_image.jpg" class="profile-img" id="splash-img" alt="Profile">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="profile-img" id="splash-img" alt="Profile" style="opacity: 0; transition: opacity 0.3s ease;">
     </div>
     <div class="name-text" id="splash-name">MOHAMED GHANEM</div>
     <div class="loading-bar">

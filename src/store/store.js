@@ -14,6 +14,7 @@ export const defaultProfile = {
   email:      '',
   phone:      '',
   facebook:   '',
+  cv:         '',
 };
 
 // Document References
@@ -55,7 +56,15 @@ export const subscribeToTechStack = (cb) => subscribeToDoc(techStackRef, cb);
 export const subscribeToExpertise = (cb) => subscribeToDoc(expertiseRef, cb);
 
 // Mutators
-export const saveProfile = async (data) => setDoc(profileRef, data);
+export const saveProfile = async (data) => {
+  try {
+    await setDoc(profileRef, data);
+    console.log('✅ Profile saved successfully:', data);
+  } catch (e) {
+    console.error('❌ Failed to save profile:', e);
+    alert('Failed to save profile: ' + e.message);
+  }
+};
 export const saveProjects = async (data) => setDoc(projectsRef, { items: data });
 export const saveServices = async (data) => setDoc(servicesRef, { items: data });
 export const saveExperience = async (data) => setDoc(experienceRef, { items: data });

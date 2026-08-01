@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { uploadToCloudinary } from '../lib/cloudinary';
-import { auth, storage } from '../lib/firebase';
+import { auth } from '../lib/firebase';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Save, Plus, Trash2, Link as LinkIcon, LogOut, LayoutDashboard, Briefcase, FileText, Award, BarChart, Settings, User } from 'lucide-react';
 
 export default function AdminDashboard({
@@ -47,19 +46,7 @@ export default function AdminDashboard({
     setIsUploading(false);
   };
 
-  const uploadCvToFirebase = async (file, callback) => {
-    if (!file) return;
-    setIsUploading(true);
-    try {
-      const storageRef = ref(storage, `cv/${file.name}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      callback(url);
-    } catch (e) {
-      alert("CV Upload failed: " + e.message);
-    }
-    setIsUploading(false);
-  };
+
 
   if (!user) {
     return (
@@ -156,14 +143,12 @@ export default function AdminDashboard({
               <div className="form-row">
                 <div className="form-group"><label>Phone</label><input className="flutter-input" placeholder="+201019964918" value={profile.phone || ''} onChange={e => onProfileChange({...profile, phone: e.target.value})} /></div>
                 <div className="form-group">
-                  <label>CV (Upload PDF)</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <label className="flutter-btn primary small" style={{whiteSpace: 'nowrap', cursor: 'pointer'}}>
-                      {isUploading ? 'Uploading...' : '📄 Upload CV (PDF)'}
-                      <input type="file" hidden accept=".pdf" onChange={e => uploadCvToFirebase(e.target.files[0], url => onProfileChange({...profile, cv: url}))} />
-                    </label>
-                    {profile.cv && <a href={profile.cv} target="_blank" rel="noreferrer" style={{color: '#0ea5e9', whiteSpace: 'nowrap', fontSize: '13px'}}>✅ View Current CV</a>}
+                  <label>CV Link</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <input className="flutter-input" style={{flex: 1}} placeholder="Paste Google Drive or any public PDF link" value={profile.cv || ''} onChange={e => onProfileChange({...profile, cv: e.target.value})} />
+                    {profile.cv && <a href={profile.cv} target="_blank" rel="noreferrer" style={{color: '#0ea5e9', whiteSpace: 'nowrap', fontSize: '12px'}}>🔗 Test</a>}
                   </div>
+                  <p style={{color: '#64748b', fontSize: '11px', marginTop: '6px'}}>Upload your CV to Google Drive → Share → Copy link → Paste here</p>
                 </div>
               </div>
             </div>

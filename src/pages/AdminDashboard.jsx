@@ -200,6 +200,20 @@ export default function AdminDashboard({
                     }} />
                   </div>
 
+                  <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '15px' }}>
+                    <input 
+                      type="checkbox" 
+                      id={`private-repo-${idx}`}
+                      checked={proj.isPrivateRepo || false}
+                      onChange={e => {
+                        const n = [...projects]; 
+                        n[idx].isPrivateRepo = e.target.checked; 
+                        onProjectsChange(n);
+                      }} 
+                    />
+                    <label htmlFor={`private-repo-${idx}`} style={{ margin: 0, cursor: 'pointer' }}>Is Private GitHub Repo (Show "Contact Admin" in portfolio)</label>
+                  </div>
+
                   <div className="dynamic-links-section" style={{ background: '#0f172a', padding: '15px', borderRadius: '8px', marginTop: '1rem', border: '1px solid #1e293b' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                       <label style={{ margin: 0, color: '#0ea5e9' }}>Dynamic Action Buttons (Links)</label>

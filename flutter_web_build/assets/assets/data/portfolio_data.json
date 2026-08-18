@@ -1,16 +1,16 @@
 {
   "personalInfo": {
-    "name": "Mohamed Ghanem",
-    "title": "Flutter Developer | Mobile App Engineer",
+    "name": "Yousef Ashraf",
+    "title": "Flutter Developer",
     "description": "I build scalable mobile applications using Flutter, Clean Architecture, and AI integrations.",
     "about": "Computer Science graduate (Ranked first in my class) and Flutter Developer with hands-on experience building scalable mobile applications. Passionate about sharing knowledge as a Coding Instructor and continuously growing through professional projects.",
     "image": "assets/images/my_image.jpg",
     "cv": "assets/assets/pdf/MG.pdf",
-    "github": "https://github.com/MohamedRefky",
+    "github": "https://github.com/Yousef7i",
     "linkedin": "https://www.linkedin.com/in/mohamedrefky/",
-    "email": "mohamedrifky9765@gmail.com",
-    "whatsappNumber": "+201019964918",
-    "phone": "+201019964918"
+    "email": "",
+    "whatsappNumber": "",
+    "phone": ""
   },
   "stats": [
     {
@@ -83,7 +83,7 @@
         "BLoC"
       ],
       "playStoreUrl": null,
-      "githubUrl": "https://github.com/MohamedRefky/Eduon"
+      "githubUrl": "https://github.com/Yousef7i/Eduon"
     },
     {
       "title": "Diety App",
@@ -97,7 +97,7 @@
         "ML"
       ],
       "playStoreUrl": null,
-      "githubUrl": "https://github.com/MohamedRefky/Diety_app"
+      "githubUrl": "https://github.com/Yousef7i/Diety_app"
     }
   ],
   "certificates": [
@@ -249,7 +249,7 @@
   "socialLinks": [
     {
       "platform": "GitHub",
-      "url": "https://github.com/Mohamed-Ghanem155",
+      "url": "https://github.com/Yousef7i",
       "icon": "github"
     },
     {
@@ -264,7 +264,7 @@
     },
     {
       "platform": "Email",
-      "url": "mailto:mohamedrifky9765@gmail.com",
+      "url": "mailto:",
       "icon": "email"
     }
   ]

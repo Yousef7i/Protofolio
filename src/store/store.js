@@ -2,7 +2,7 @@ import { db } from '../lib/firebase';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 
 export const defaultProfile = {
-  name:       'Mohamed Ghanem',
+  name:       'Yousef Ashraf',
   title:      'Flutter Developer',
   bio:        'Building smooth, beautiful cross-platform applications with Flutter & Dart.',
   location:   'Egypt',

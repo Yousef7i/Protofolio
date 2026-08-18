@@ -30,7 +30,7 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/jpeg" href="https://res.cloudinary.com/doohejthr/image/upload/v1786735433/hxlbruaqqdiwof42epww.jpg"/>
+  <link id="dynamic-favicon" rel="icon" type="image/jpeg" href="https://res.cloudinary.com/doohejthr/image/upload/v1786735433/hxlbruaqqdiwof42epww.jpg"/>
 
   <!-- Open Graph (Facebook, WhatsApp, etc.) -->
   <meta property="og:type" content="website">
@@ -195,14 +195,16 @@
         const photo = data?.fields?.photo?.stringValue;
         
         if (name) {
-          document.getElementById('splash-name').innerText = name.toUpperCase();
+          document.getElementById('splash-name').innerText = name.toUpperCase(); document.title = name;
         }
         if (photo) {
           const img = document.getElementById('splash-img');
           img.onload = () => img.style.opacity = '1';
           img.src = photo;
-        }
-      } catch (e) {
+          
+          const favicon = document.getElementById('dynamic-favicon');
+          if (favicon) favicon.href = photo;
+        }      } catch (e) {
         console.warn('Could not fetch profile for splash screen', e);
       }
     }

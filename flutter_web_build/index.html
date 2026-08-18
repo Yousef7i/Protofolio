@@ -30,14 +30,14 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/jpeg" href="https://res.cloudinary.com/dk8cejoct/image/upload/v1786735433/hxlbruaqqdiwof42epww.jpg"/>
+  <link rel="icon" type="image/jpeg" href="https://res.cloudinary.com/doohejthr/image/upload/v1786735433/hxlbruaqqdiwof42epww.jpg"/>
 
   <!-- Open Graph (Facebook, WhatsApp, etc.) -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://protofolio-113.pages.dev/">
+  <meta property="og:url" content="https://YOUR_NEW_DOMAIN.pages.dev/">
   <meta property="og:title" content="Mohamed Ghanem - Flutter Developer">
   <meta property="og:description" content="Flutter Developer | Mobile App Engineer — Building smooth, beautiful cross-platform applications with Flutter & Dart.">
-  <meta property="og:image" content="https://protofolio-113.pages.dev/og-image.jpg">
+  <meta property="og:image" content="https://YOUR_NEW_DOMAIN.pages.dev/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
@@ -45,7 +45,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Mohamed Ghanem - Flutter Developer">
   <meta name="twitter:description" content="Flutter Developer | Mobile App Engineer — Building smooth, beautiful cross-platform applications with Flutter & Dart.">
-  <meta name="twitter:image" content="https://protofolio-113.pages.dev/og-image.jpg">
+  <meta name="twitter:image" content="https://YOUR_NEW_DOMAIN.pages.dev/og-image.jpg">
 
   <title>Mohamed Ghanem</title>
   <link rel="manifest" href="manifest.json">
@@ -189,7 +189,7 @@
 
     async function fetchProfileForSplash() {
       try {
-        const res = await fetch('https://firestore.googleapis.com/v1/projects/protofolio-10ae6/databases/(default)/documents/portfolio/profile');
+        const res = await fetch('https://firestore.googleapis.com/v1/projects/protofolio-4cd28/databases/(default)/documents/portfolio/profile');
         const data = await res.json();
         const name = data?.fields?.name?.stringValue;
         const photo = data?.fields?.photo?.stringValue;

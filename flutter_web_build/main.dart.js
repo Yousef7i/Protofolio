@@ -39080,20 +39080,22 @@ A.a7f.prototype={
 $1(a){return this.a.$1(t.a.a(a))},
 $S:103}
 A.a78.prototype={
-$1(a){var s,r,q,p,o=J.a6(a),n=o.h(a,"title")
-if(n==null)n=o.h(a,"pf_title")
-if(n==null)n="Untitled"
-s=o.h(a,"description")
+$1(a){var s,r,q,p,o,n=J.a6(a),m=n.h(a,"title")
+if(m==null)m=n.h(a,"pf_title")
+if(m==null)m="Untitled"
+s=n.h(a,"description")
 if(s==null)s=""
-r=o.h(a,"url")
-if(r==null)r=o.h(a,"secure_url")
+r=n.h(a,"url")
+if(r==null)r=n.h(a,"secure_url")
 if(r==null)r=""
-q=o.h(a,"technologies")
+q=n.h(a,"technologies")
 if(q==null)q=[]
-p=o.h(a,"links")
+p=n.h(a,"links")
 if(p==null)p=[]
-o=o.h(a,"modules")
-return A.ar(["title",n,"description",s,"imageUrl",r,"technologies",q,"links",p,"modules",o==null?[]:o],t.N,t.z)},
+o=n.h(a,"modules")
+if(o==null)o=[]
+n=n.h(a,"isPrivateRepo")
+return A.ar(["title",m,"description",s,"imageUrl",r,"technologies",q,"links",p,"modules",o,"isPrivateRepo",n==null?!1:n],t.N,t.z)},
 $S:38}
 A.a79.prototype={
 $1(a){var s,r=J.a6(a),q=r.h(a,"title")

@@ -24007,7 +24007,7 @@ a1T(a,b,c,d){return d.a(A.aD4(a,b,c,null,null,null))},
 vD(){var s=J.W($.bo,"personalInfo")
 return s==null?A.v(t.N,t.z):s},
 Fv(){var s=J.W(A.vD(),"name")
-return s==null?"Mohamed Refky":s},
+return s==null?"Yousef Ashraf":s},
 Fu(){var s=J.W(A.vD(),"image")
 return s==null?"":s},
 lM(a){switch(a){case"mobileScreen":return B.Cv

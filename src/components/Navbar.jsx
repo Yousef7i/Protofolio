@@ -11,9 +11,13 @@ export default function Navbar() {
 
   return (
     <nav className="navbar" ref={ref}>
-      <a className="nav-logo" href="#">Port<em>folio</em></a>
+      <a className="nav-logo" href="#home">Yousef <em>Ashraf</em></a>
       <ul className="nav-links">
-        <li><a href="#work">Work</a></li>
+        <li><a href="#home">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#work">Projects</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
   );
